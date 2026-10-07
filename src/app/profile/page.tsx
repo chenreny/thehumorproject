@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SiteNav } from "@/components/site-nav";
 import Image from "next/image";
 import { requireProfile } from "@/lib/profile";
 import { ProfileForm } from "./profile-form";
@@ -15,31 +15,31 @@ export default async function ProfilePage({
   const { avatar } = await searchParams;
 
   return (
-    <main className="min-h-screen bg-amber-50 px-5 py-16 text-zinc-950">
-      <div className="mx-auto max-w-3xl">
-        <nav className="mb-8 flex gap-6 font-bold underline"><Link href="/">All jokes</Link><Link href="/members">Members</Link></nav>
-        <h1 className="mb-2 text-5xl font-black">Your profile</h1>
-        <p className="mb-8 text-zinc-700">Signed in as {user.email}</p>
-        <section className="rounded-[2rem] border-4 border-zinc-950 bg-yellow-300 p-7 shadow-[8px_8px_0_0_#18181b]">
-          <h2 className="mb-6 text-2xl font-black">About you</h2>
+    <main className="page-shell">
+      <div className="page-width">
+        <SiteNav signedIn active="profile" /><div className="mx-auto max-w-2xl">
+        <h1 className="mb-2 text-3xl font-bold tracking-tight">Your profile</h1>
+        <p className="mb-8 break-words text-sm text-muted">Signed in as {user.email}</p>
+        <section className="panel p-6 sm:p-7">
+          <h2 className="mb-6 text-lg font-semibold">About you</h2>
           <ProfileForm firstName={profile.first_name} lastName={profile.last_name} />
         </section>
-        <section className="mt-10 rounded-[2rem] border-4 border-zinc-950 bg-rose-300 p-7 shadow-[8px_8px_0_0_#18181b]">
-          <h2 className="mb-5 text-2xl font-black">Photo</h2>
-          {avatarUrl ? <Image src={avatarUrl} width={128} height={128} unoptimized alt="Your profile photo" className="mb-5 h-32 w-32 rounded-full border-4 border-zinc-950 object-cover" />
-            : <div className="mb-5 flex h-32 w-32 items-center justify-center rounded-full border-4 border-zinc-950 bg-white font-bold">No photo</div>}
+        <section className="panel mt-6 p-6 sm:p-7">
+          <h2 className="mb-5 text-lg font-semibold">Photo</h2>
+          {avatarUrl ? <Image src={avatarUrl} width={128} height={128} unoptimized alt="Your profile photo" className="mb-5 h-24 w-24 rounded-full border border-stone-200 object-cover" />
+            : <div className="mb-5 grid size-24 place-items-center rounded-full border border-stone-200 bg-accent-surface text-sm text-accent">No photo</div>}
           <form action="/profile/avatar" method="post" encType="multipart/form-data" className="space-y-4">
-            <label className="block font-bold">Choose a photo
-              <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required className="mt-2 block w-full" />
+            <label className="block text-sm font-semibold">Choose a photo
+              <input type="file" name="avatar" accept="image/jpeg,image/png,image/webp" required className="mt-3 block w-full min-w-0 text-sm font-normal text-muted file:mr-3 file:rounded-lg file:border-0 file:bg-accent-surface file:px-4 file:py-3 file:font-semibold file:text-accent" />
             </label>
-            <p className="text-sm">JPEG, PNG, or WebP, up to 2 MB. Your photo is publicly viewable.</p>
-            <button className="rounded-xl bg-zinc-950 px-6 py-3 font-bold text-white">Upload photo</button>
+            <p className="text-xs text-muted">JPEG, PNG, or WebP, up to 2 MB. Your photo is publicly viewable.</p>
+            <button className="button-primary">Upload photo</button>
           </form>
-          {avatar === "saved" && <p role="status" className="mt-4 font-bold text-green-800">Photo updated.</p>}
-          {avatar === "invalid" && <p role="alert" className="mt-4 font-bold text-red-800">Choose a valid image under 2 MB.</p>}
-          {avatar === "error" && <p role="alert" className="mt-4 font-bold text-red-800">Could not upload your photo. Please try again.</p>}
+          {avatar === "saved" && <p role="status" className="mt-4 font-bold text-accent">Photo updated.</p>}
+          {avatar === "invalid" && <p role="alert" className="mt-4 font-bold text-accent">Choose a valid image under 2 MB.</p>}
+          {avatar === "error" && <p role="alert" className="mt-4 font-bold text-accent">Could not upload your photo. Please try again.</p>}
         </section>
-        <form action="/auth/logout" method="post" className="mt-10"><button className="font-bold underline">Sign out</button></form>
+        </div>
       </div>
     </main>
   );

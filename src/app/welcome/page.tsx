@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { SiteNav } from "@/components/site-nav";
 import { profileComplete, requireProfile } from "@/lib/profile";
 import { ProfileForm } from "@/app/profile/profile-form";
 
@@ -7,12 +8,12 @@ export default async function Welcome() {
   if (profileComplete(profile)) redirect("/members");
 
   return (
-    <main className="min-h-screen bg-amber-50 px-5 py-16 text-zinc-950">
-      <div className="mx-auto max-w-xl rounded-[2rem] border-4 border-zinc-950 bg-yellow-300 p-8 shadow-[8px_8px_0_0_#18181b]">
-        <p className="mb-3 text-sm font-black uppercase tracking-widest">One quick thing</p>
-        <h1 className="text-4xl font-black">Welcome to the club.</h1>
-        <p className="my-6 text-lg">Add your first and last name to finish setting up your profile.</p>
-        <ProfileForm firstName={profile.first_name} lastName={profile.last_name} onboarding />
+    <main className="page-shell">
+      <div className="page-width">
+        <SiteNav signedIn /><div className="panel mx-auto max-w-xl p-8"><p className="eyebrow mb-3">One quick thing</p>
+        <h1 className="text-3xl font-bold tracking-tight">Welcome to the club.</h1>
+        <p className="my-6 text-sm leading-relaxed text-muted">Add your first and last name to finish setting up your profile.</p>
+        <ProfileForm firstName={profile.first_name} lastName={profile.last_name} onboarding /></div>
       </div>
     </main>
   );

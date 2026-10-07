@@ -20,21 +20,21 @@ export function ProfileForm({
     <form action={action} className="space-y-5">
       <input type="hidden" name="onboarding" value={String(onboarding)} />
       <div className="grid gap-5 sm:grid-cols-2">
-        <label className="block font-bold">
+        <label className="block text-sm font-semibold">
           First name
           <input name="first_name" defaultValue={firstName ?? ""} maxLength={80} required
-            autoComplete="given-name" className="mt-2 block w-full rounded-xl border-2 border-zinc-900 bg-white px-4 py-3 font-normal" />
+            autoComplete="given-name" className="field mt-2 block font-normal" />
         </label>
-        <label className="block font-bold">
+        <label className="block text-sm font-semibold">
           Last name
           <input name="last_name" defaultValue={lastName ?? ""} maxLength={80} required
-            autoComplete="family-name" className="mt-2 block w-full rounded-xl border-2 border-zinc-900 bg-white px-4 py-3 font-normal" />
+            autoComplete="family-name" className="field mt-2 block font-normal" />
         </label>
       </div>
-      <button disabled={pending} className="rounded-xl bg-zinc-950 px-6 py-3 font-bold text-white disabled:opacity-50">
+      <button disabled={pending} className="button-primary">
         {pending ? "Saving…" : onboarding ? "Save and continue" : "Save names"}
       </button>
-      {state.message && <p role="status" className={state.error ? "font-semibold text-red-700" : "font-semibold text-green-800"}>{state.message}</p>}
+      {state.message && <p role="status" className={state.error ? "font-semibold text-accent-strong" : "font-semibold text-accent"}>{state.message}</p>}
     </form>
   );
 }
