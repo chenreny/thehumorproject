@@ -91,11 +91,11 @@ reset role;
 
 -- Verify the database enforces the limit, persistence, and atomic publication.
 do $$ declare request_id uuid; published_id uuid; begin
- for i in 1..5 loop
+ for i in 1..10 loop
   request_id := public.reserve_generation('10000000-0000-4000-8000-000000000002', 'Another private scene', 'Exact system prompt', 'NYC', 'test-model');
  end loop;
  begin
-  perform public.reserve_generation('10000000-0000-4000-8000-000000000002', 'The sixth request', 'Test', 'Campus', 'test');
+  perform public.reserve_generation('10000000-0000-4000-8000-000000000002', 'The eleventh request', 'Test', 'Campus', 'test');
   raise exception 'Limit was not enforced';
  exception when raise_exception then
   if sqlerrm <> 'GENERATION_LIMIT' then raise; end if;

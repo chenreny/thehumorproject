@@ -1,7 +1,7 @@
 # The Humor Project
 
-An image-meme feed for Columbia students. Signed-in members choose a classic reaction template or upload a photo and
-describe a scene. GPT-6 Luna looks at the photo, writes short top/bottom captions,
+An image-meme feed for Columbia students. Signed-in members choose a classic reaction template, upload a photo, or
+describe a scene for AI to illustrate. GPT-6 Luna looks at the image, writes short top/bottom captions,
 and the community votes on the resulting meme.
 Google sign-in, onboarding, profiles, and avatar uploads remain available.
 
@@ -10,8 +10,9 @@ Google sign-in, onboarding, profiles, and avatar uploads remain available.
 - **Daily inspiration:** a rotating prompt changes at midnight in New York,
   giving Sam a quick reason to return and an easy starting point.
 - **Images first:** browse eight locally hosted reaction templates, search by name
-  or mood, and filter categories. Or upload a JPEG, PNG, or WebP (up to 3 MB).
-  Preview the image, then add context. The AI sees the actual image. Sign-in is required
+  or mood, and filter categories. Or upload a JPEG, PNG, or WebP (up to 3 MB), or
+  have AI create an original image from your scene. Preview provided images, then add context.
+  The AI sees the actual image when it writes the caption. Sign-in is required
   to browse templates, create memes, or read the feed.
 - **Local, specific humor:** Campus, NYC, and Dorm life topics connect the jokes
   to a student exploring New York on weekends.
@@ -39,11 +40,13 @@ SUPABASE_SERVICE_ROLE_KEY=your-server-only-service-role-key
 OPENAI_API_KEY=your-server-only-openai-key
 # Optional; the default is the requested Luna model:
 OPENAI_MODEL=gpt-6-luna
+# Optional; the default is the OpenAI image model used for generated photos:
+OPENAI_IMAGE_MODEL=gpt-image-2.5-flare
 ```
 
 Add these variables in Vercel's Production environment as well. Never prefix
 server keys with `NEXT_PUBLIC_`. OpenAI needs a funded API account with access to
-GPT-6 Luna. The app uses Responses API image input with `detail: low`, structured output,
+GPT-6 Luna and the configured image model. The app uses the Images API for generated photos and Responses API image input with `detail: low`, structured output,
 no reasoning tokens, a 400-token output cap, a 30-second timeout, and `store: false`.
 
 ## Supabase
