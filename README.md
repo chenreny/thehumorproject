@@ -20,7 +20,7 @@ Google sign-in, onboarding, profiles, and avatar uploads remain available.
   help good content surface without old winners dominating forever.
 - **Shareable joke pages:** every generated meme has a member URL and copy-link
   button for group chats. Opening shared links, creation, and voting all require sign-in.
-- **One changeable vote:** Funny (+1) or Not quite (-1), with persisted feedback.
+- **One changeable vote:** Upvote (+1) or downvote (-1), with persisted feedback.
   Repeated clicks cannot inflate scores.
 - **Private prompt history:** members can see their last ten generation attempts,
   and links to the results. Prompts are not published in the feed.

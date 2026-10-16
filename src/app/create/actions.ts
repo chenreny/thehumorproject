@@ -7,7 +7,7 @@ import path from "node:path";
 import { createClient, supabaseConfig } from "@/lib/supabase/server";
 import { normalizeMemeImage } from "@/lib/meme-image";
 import { imageFileError } from "@/lib/media";
-import { SYSTEM_PROMPT, parseMemeCaption, validateScene } from "@/lib/generation";
+import { SYSTEM_PROMPT, parseMemeCaption, topicLabel, validateScene } from "@/lib/generation";
 import { getTemplate } from "@/lib/templates";
 
 export type GenerationState = {
@@ -41,6 +41,7 @@ export async function generateCaption(_previous: GenerationState, formData: Form
   if (authError || !user) return { message: "Sign in to make a meme." };
   const input = validateScene(formData.get("prompt"), formData.get("topic"));
   if (!input) return { message: "Choose a topic and describe your scene in 10–500 characters." };
+  const modelTopic = topicLabel(input.topic);
   const imageSource = formData.get("image_source");
   if (imageSource !== "provided" && imageSource !== "generated") return { message: "Choose a template, upload a photo, or generate an image." };
   const templateId = formData.get("template_id");
@@ -51,8 +52,10 @@ export async function generateCaption(_previous: GenerationState, formData: Form
   if (imageSource === "provided" && !template && !file) return { message: "Choose a template or upload a photo." };
   if (template) {
     try {
-      const bytes = await readFile(path.join(process.cwd(), "public", "meme-templates", `${template.id}.jpg`));
-      file = new File([new Uint8Array(bytes)], `${template.id}.jpg`, { type: "image/jpeg" });
+      const bytes = await readFile(path.join(process.cwd(), "public", template.file));
+      const fileName = template.file.split("/").pop() ?? "meme-template.jpg";
+      const contentType = fileName.endsWith(".webp") ? "image/webp" : "image/jpeg";
+      file = new File([new Uint8Array(bytes)], fileName, { type: contentType });
     } catch { return { message: "That template couldn't load. Try another or upload a photo." }; }
   }
   if (imageSource === "provided") {
@@ -81,7 +84,7 @@ export async function generateCaption(_previous: GenerationState, formData: Form
   let meme: GenerationState["meme"];
   try {
     if (imageSource === "generated") {
-      const generatedBytes = await generateMemeImage(input.prompt, input.topic, apiKey);
+      const generatedBytes = await generateMemeImage(input.prompt, modelTopic, apiKey);
       imageBytes = await normalizeMemeImage(new File([new Uint8Array(generatedBytes)], "ai-generated.jpg", { type: "image/jpeg" }));
     }
     if (!imageBytes) throw new Error("Image unavailable");
@@ -96,7 +99,7 @@ export async function generateCaption(_previous: GenerationState, formData: Form
         model, store: false, reasoning: { effort: "none" }, max_output_tokens: 400,
         instructions: SYSTEM_PROMPT,
         input: [{ role: "user", content: [
-          { type: "input_text", text: `Topic: ${input.topic}\nScene: ${input.prompt}` },
+          { type: "input_text", text: `Topic: ${modelTopic}\nScene: ${input.prompt}` },
           { type: "input_image", image_url: `data:image/jpeg;base64,${imageBytes.toString("base64")}`, detail: "low" },
         ] }],
         text: { format: { type: "json_schema", name: "caption", strict: true, schema: {

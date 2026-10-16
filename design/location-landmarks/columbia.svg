@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Columbia library at night</title>
+  <defs>
+    <linearGradient id="sky" x1="80" y1="5" x2="80" y2="110" gradientUnits="userSpaceOnUse"><stop stop-color="#294A77"/><stop offset="1" stop-color="#15263E"/></linearGradient>
+    <linearGradient id="stone" x1="80" y1="41" x2="80" y2="106" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF0CE"/><stop offset="1" stop-color="#C9A978"/></linearGradient>
+  </defs>
+  <path d="M26 5h108c12 0 21 9 21 21v76c0 12-9 21-21 21H26c-12 0-21-9-21-21V26C5 14 14 5 26 5Z" fill="url(#sky)" stroke="#FFE4AD" stroke-width="4"/>
+  <path d="M17 91c20-13 39-12 61-7 22 5 44 1 65-8v35H17V91Z" fill="#1A3A46"/>
+  <circle cx="126" cy="28" r="9" fill="#FFE5A8"/>
+  <path d="M27 26h2m-1-1v2M42 40h2m-1-1v2M121 54h2m-1-1v2" stroke="#FFE8BA" stroke-width="2" stroke-linecap="round"/>
+  <path d="M49 52c0-16 13-29 31-29s31 13 31 29H49Z" fill="#81B9D5" stroke="#FFEECE" stroke-width="3"/>
+  <path d="M59 49c2-10 10-17 21-17s19 7 21 17" stroke="#D9EBE6" stroke-width="2"/>
+  <path d="M80 23v-8m-6 1h12" stroke="#FFDF9E" stroke-width="3" stroke-linecap="round"/>
+  <path d="M39 56h82v9H39zM45 65h70v38H45z" fill="url(#stone)" stroke="#443B43" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M53 68v32m13-32v32m14-32v32m14-32v32m13-32v32" stroke="#5A5A63" stroke-width="3"/>
+  <path d="M49 67h62M49 100h62" stroke="#FFF5DD" stroke-width="3"/>
+  <path d="M74 83a6 6 0 0 1 12 0v17H74V83Z" fill="#293C55" stroke="#FFF1D0" stroke-width="2"/>
+  <path d="M31 104h98l-5 6H36l-5-6ZM26 111h108l-5 7H31l-5-7Z" fill="#D9B786" stroke="#514856" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M24 112V88m0 0c-6-3-8-8-5-13 3-4 8-4 11-1 5 1 8 7 4 11-2 3-6 4-10 3Zm112 24V88m0 0c-6-3-8-8-5-13 3-4 8-4 11-1 5 1 8 7 4 11-2 3-6 4-10 3Z" fill="#5E8E66" stroke="#244A48" stroke-width="2" stroke-linecap="round"/>
+</svg>

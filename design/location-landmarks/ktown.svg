@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">Ktown karaoke and late-night food storefront</title>
+  <defs><linearGradient id="sky" x1="80" y1="4" x2="80" y2="122" gradientUnits="userSpaceOnUse"><stop stop-color="#42366E"/><stop offset="1" stop-color="#18263E"/></linearGradient></defs>
+  <path d="M26 5h108c12 0 21 9 21 21v76c0 12-9 21-21 21H26c-12 0-21-9-21-21V26C5 14 14 5 26 5Z" fill="url(#sky)" stroke="#FFD9B2" stroke-width="4"/>
+  <path d="M21 30V16" stroke="#AAD7C4" stroke-width="3" stroke-linecap="round"/>
+  <path d="M21 17h92v20H21V17Z" fill="#287B6F" stroke="#D8EFCE" stroke-width="2"/>
+  <text x="67" y="31" fill="#F4FFE9" font-family="Arial, sans-serif" font-size="12" font-weight="800" text-anchor="middle">KOREA WAY</text>
+  <path d="M135 22h2m-1-1v2M19 54h2m-1-1v2M123 42h2m-1-1v2" stroke="#FFE5AB" stroke-width="2" stroke-linecap="round"/>
+  <path d="M26 96V40h108v56H26Z" fill="#352D4A" stroke="#F0AF9D" stroke-width="3"/>
+  <path d="M29 44h102v29H29V44Z" fill="#523955"/>
+  <path d="M39 51h64v15H39V51Z" fill="#2F2746" stroke="#FF87BD" stroke-width="2"/>
+  <path d="M48 59h4m7 0h5m7 0h4m8 0h4m7 0h2" stroke="#FFC0D6" stroke-width="3" stroke-linecap="round"/>
+  <path d="M113 29v53" stroke="#7B5B77" stroke-width="4"/>
+  <path d="M105 31h25v46h-25z" fill="#743B70" stroke="#FF91C5" stroke-width="3"/>
+  <path d="M111 42h13M111 52h13M111 62h13" stroke="#FFD4E4" stroke-width="2" stroke-linecap="round"/>
+  <path d="M25 73h110l-5 15H30l-5-15Z" fill="#FF9E83" stroke="#FFE5CE" stroke-width="2"/>
+  <path d="M40 74v13m20-13v13m20-13v13m20-13v13m20-13v13" stroke="#FFE6D6" stroke-width="2"/>
+  <path d="M34 88h34v25H34z" fill="#263B5B" stroke="#FABE9C" stroke-width="2"/>
+  <path d="M77 88h44v25H77z" fill="#263B5B" stroke="#FABE9C" stroke-width="2"/>
+  <path d="M43 96h16m-8-7v19M83 96h30" stroke="#FFE3B0" stroke-width="2"/>
+  <circle cx="97" cy="102" r="6" fill="#FFDC91" opacity=".75"/>
+  <path d="M17 113h127" stroke="#E9A480" stroke-width="4" stroke-linecap="round"/>
+  <path d="M133 106c-2-5-4-7-7-8m7 8c3-3 6-4 9-4" stroke="#FFB0D3" stroke-width="2" stroke-linecap="round"/>
+</svg>

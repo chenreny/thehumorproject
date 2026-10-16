@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 128" fill="none" role="img" aria-labelledby="title">
+  <title id="title">The Astor Place Cube in the East Village</title>
+  <defs><linearGradient id="sky" x1="80" y1="5" x2="80" y2="123" gradientUnits="userSpaceOnUse"><stop stop-color="#405371"/><stop offset="1" stop-color="#1C2C42"/></linearGradient></defs>
+  <path d="M26 5h108c12 0 21 9 21 21v76c0 12-9 21-21 21H26c-12 0-21-9-21-21V26C5 14 14 5 26 5Z" fill="url(#sky)" stroke="#FFDDB0" stroke-width="4"/>
+  <circle cx="127" cy="26" r="8" fill="#FFE2A4"/>
+  <path d="M20 32h2m-1-1v2M34 21h2m-1-1v2" stroke="#FFE4AA" stroke-width="2" stroke-linecap="round"/>
+  <path d="M15 78V46h21v35m87-37h22v37" fill="#A55C54" stroke="#D19375" stroke-width="2"/>
+  <path d="M19 53h13m-13 9h13m-13 9h13m96-18h13m-13 9h13m-13 9h13" stroke="#D7917A" stroke-width="2"/>
+  <path d="M24 55h6v8h-6zm107 0h7v8h-7z" fill="#FFCA8A"/>
+  <path d="M44 49 80 27l36 22-36 22-36-22Z" fill="#4C5663" stroke="#F4C49C" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M44 49 80 71v40L44 89V49Z" fill="#242B33" stroke="#F4C49C" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M80 71 116 49v40l-36 22V71Z" fill="#171D26" stroke="#F4C49C" stroke-width="3" stroke-linejoin="round"/>
+  <path d="m50 55 25 15m-25-6 25 15m-25-6 25 15m-25-6 25 15M109 56 86 70m23-5L86 79m23-5L86 88m23-5L86 97" stroke="#637078" stroke-width="1.5" opacity=".6"/>
+  <path d="M36 113h88" stroke="#F0A884" stroke-width="4" stroke-linecap="round"/>
+  <path d="M80 111v5m-14 1h28" stroke="#FFD5A1" stroke-width="3" stroke-linecap="round"/>
+  <path d="M22 99h19m-16 0v9m12-9v9m86-9h18m-15 0v9m12-9v9" stroke="#E6A889" stroke-width="2" stroke-linecap="round"/>
+</svg>

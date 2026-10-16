@@ -1,51 +1,72 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import type { Caption } from "@/lib/captions";
 import { MemeImage } from "@/components/meme-image";
 import { Icon } from "@/components/icon";
 import { vote } from "@/app/vote-actions";
+import { upvoteCount } from "@/lib/upvotes";
 
-export function CaptionCard({ caption, signedIn, myVote = 0 }: { caption: Caption; signedIn: boolean; myVote?: number }) {
+export function CaptionCard({ caption, signedIn, myVote = 0, featured = false }: { caption: Caption; signedIn: boolean; myVote?: number; featured?: boolean }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
   const [shareMessage, setShareMessage] = useState("");
+  const [enlarged, setEnlarged] = useState(false);
+  const [localVote, setLocalVote] = useState<number | null>(null);
+  const enlargeDialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = enlargeDialog.current;
+    if (!element) return;
+    if (enlarged && !element.open) element.showModal();
+    else if (!enlarged && element.open) element.close();
+  }, [enlarged]);
   function submit(value: number) {
     setError("");
     startTransition(async () => {
       try {
         const result = await vote(caption.id, value);
         setError(result.error ?? "");
+        if (!result.error) setLocalVote(value);
       } catch { setError("Your vote wasn't saved. Please try again."); }
     });
   }
   async function share() {
     try {
       await navigator.clipboard.writeText(`${window.location.origin}/captions/${caption.id}`);
-      setShareMessage("Link copied!");
+      setShareMessage("Link copied.");
     } catch { setShareMessage("Open the meme and copy its address to share."); }
   }
-  return (
-    <article className="flex h-full min-w-0 flex-col">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] text-accent"><span className="font-medium text-accent">{caption.topic}</span><span>AI caption</span></div>
-      {caption.image_path ? <div className="overflow-hidden rounded-2xl">
-        <h2 className="sr-only">{caption.setup}</h2>
-        <Link href={`/captions/${caption.id}`} aria-label={`Open meme: ${caption.setup}`} className="block rounded-2xl">
-          <MemeImage src={caption.image_url} description={caption.image_description || "Uploaded meme photo"} top={caption.setup} bottom={caption.punchline} />
-        </Link>
-      </div> : <><h2 className="rounded-t-2xl bg-white px-6 pt-6 text-2xl font-normal leading-snug tracking-tight"><Link href={`/captions/${caption.id}`}>{caption.setup}</Link></h2><p className="mb-2 rounded-b-2xl bg-white px-6 pb-8 pt-4 leading-relaxed text-accent">{caption.punchline}</p></>}
-      <div className="mt-auto px-1 pb-1 pt-4">
-        <p className="mb-3 text-[11px] text-accent" aria-live="polite">{caption.score > 0 ? "+" : ""}{caption.score} score · {caption.votes} {Number(caption.votes) === 1 ? "vote" : "votes"}{signedIn && myVote !== 0 ? " · Your vote is saved" : ""}</p>
-        {signedIn ? <div className="flex flex-wrap gap-2" aria-label="Rate this meme" aria-busy={pending}>
-          <button onClick={() => submit(1)} disabled={pending || myVote === 1} aria-pressed={myVote === 1} aria-label="Upvote" title="Upvote" className={`group grid size-11 place-items-center rounded-xl border text-xl transition-colors ${myVote === 1 ? "border-accent-border-strong bg-accent-selected" : "border-accent-border bg-white/70 hover:bg-white"}`}><span aria-hidden="true">🤣</span></button>
-          <button onClick={() => submit(-1)} disabled={pending || myVote === -1} aria-pressed={myVote === -1} aria-label="Downvote" title="Downvote" className={`group grid size-11 place-items-center rounded-xl border text-xl transition-colors ${myVote === -1 ? "border-accent-border-strong bg-accent-selected" : "border-accent-border bg-white/70 hover:bg-white"}`}><span aria-hidden="true">👎</span></button>
-          <button onClick={share} className="ml-auto flex min-h-10 items-center gap-1.5 px-1 text-xs font-medium text-accent hover:text-foreground">Share<Icon name="arrow" className="!size-3" /></button>
-        </div> : <div className="flex min-h-10 items-center justify-between gap-3 text-xs font-medium text-accent"><a href={`/auth/login?next=/captions/${caption.id}`} className="underline underline-offset-4">Sign in to rate</a><button onClick={share} className="underline underline-offset-4">Share</button></div>}
-        {pending && <p role="status" className="mt-3 text-sm text-accent">Saving your vote…</p>}
-        {error && <p role="alert" className="mt-3 text-sm font-bold text-accent-strong">{error}</p>}
-        {shareMessage && <p role="status" className="mt-3 text-sm text-accent">{shareMessage}</p>}
-      </div>
-    </article>
-  );
+  const label = `${caption.setup} ${caption.punchline}`;
+  const currentVote = localVote ?? myVote;
+  const count = upvoteCount(caption, myVote, currentVote);
+  return <article className={`caption-card flex h-full min-w-0 flex-col ${featured ? "caption-featured" : ""}`}>
+    {caption.image_path ? <div className="overflow-hidden rounded-xl">
+      <h2 className="sr-only">{caption.setup}</h2>
+      {featured ? <button type="button" aria-label={`Enlarge meme: ${label}`} className="featured-image-button" onClick={() => setEnlarged(true)}><MemeImage variant="stage" src={caption.image_url} description={caption.image_description || "Uploaded meme photo"} top={caption.setup} bottom={caption.punchline} /></button>
+        : <div className="block rounded-xl"><MemeImage variant="square" src={caption.image_url} description={caption.image_description || "Uploaded meme photo"} top={caption.setup} bottom={caption.punchline} /></div>}
+    </div> : <div className={`text-only-meme ${featured ? "text-only-stage" : ""}`}>
+      <h2>{caption.setup}</h2>
+      <p>{caption.punchline}</p>
+    </div>}
+    <div className={`caption-actions mt-auto ${featured ? "caption-actions-featured" : ""}`}>
+      {signedIn ? <div className="reaction-row" role="group" aria-label="Rate this meme" aria-busy={pending}>
+        <button onClick={() => submit(1)} disabled={pending || currentVote === 1} aria-pressed={currentVote === 1} aria-label="Upvote meme" title="Upvote meme" className={`reaction-button reaction-vote-button ${currentVote === 1 ? "is-selected" : ""}`}><Icon name="thumb" /></button>
+        <span className="reaction-count" aria-label={`${count} upvotes`}>{count}</span>
+        <button onClick={() => submit(-1)} disabled={pending || currentVote === -1} aria-pressed={currentVote === -1} aria-label="Downvote meme" title="Downvote meme" className={`reaction-button reaction-vote-button reaction-vote-down ${currentVote === -1 ? "is-selected" : ""}`}><Icon name="thumb" /></button>
+        <button onClick={share} className="reaction-button reaction-share"><Icon name="upload" /><span>Share</span><span aria-hidden="true">↗</span></button>
+      </div> : <div className="reaction-row">
+        <a href={`/auth/login?next=/captions/${caption.id}`} className="reaction-button"><span>Sign in to vote</span></a>
+        <span className="reaction-count" aria-label={`${count} upvotes`}>{count}</span>
+        <button onClick={share} className="reaction-button reaction-share"><Icon name="upload" /><span>Share</span><span aria-hidden="true">↗</span></button>
+      </div>}
+      {pending && <p role="status" className="action-feedback">Saving your vote…</p>}
+      {error && <p role="alert" className="action-feedback action-error">{error}</p>}
+      {shareMessage && <p role="status" className="action-feedback">{shareMessage}</p>}
+      {signedIn && <p className="sr-only">One vote per meme. You can change your mind anytime.</p>}
+    </div>
+    {featured && caption.image_path && <dialog ref={enlargeDialog} className="meme-dialog" aria-labelledby={`enlarged-title-${caption.id}`} onClose={() => setEnlarged(false)} onClick={(event) => { if (event.target === event.currentTarget) event.currentTarget.close(); }}>
+      <div className="meme-dialog-card"><div className="meme-dialog-heading"><h2 id={`enlarged-title-${caption.id}`}>Enlarged meme</h2><button type="button" aria-label="Close enlarged meme" onClick={() => enlargeDialog.current?.close()}>×</button></div><MemeImage variant="stage" src={caption.image_url} description={caption.image_description || "Uploaded meme photo"} top={caption.setup} bottom={caption.punchline} /><Link href={`/captions/${caption.id}`} className="meme-dialog-detail">Open meme page →</Link></div>
+    </dialog>}
+  </article>;
 }

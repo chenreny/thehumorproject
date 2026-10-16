@@ -1,13 +1,29 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getTemplate, MEME_TEMPLATES } from '../src/lib/templates.ts';
+import { getTemplate, MEME_TEMPLATES, templateSrc } from '../src/lib/templates.ts';
 import { validateScene, parseCaption, parseMemeCaption, dailyScene } from '../src/lib/generation.ts';
+import { safeAuthDestination } from '../src/lib/auth-redirect.ts';
+
+test('studio context survives sign-in without allowing external redirects', () => {
+  const query = new URLSearchParams({ topic: 'Campus', prompt: 'My laundry pile now wants to split the rent.' });
+  assert.equal(safeAuthDestination(`/create?${query}`), `/create?${query}`);
+  assert.equal(safeAuthDestination('/create?daily=1&unknown=discard'), '/create?daily=1');
+  assert.equal(safeAuthDestination('/create?topic=Unknown&prompt=short'), '/create');
+  assert.equal(safeAuthDestination(`/create?prompt=${'a'.repeat(501)}`), '/create');
+  for (const destination of ['https://example.com/create', '//example.com/create', '/create?topic=Campus&topic=NYC', '/create?prompt=first+valid+prompt&prompt=second+valid+prompt', '/create?daily=1&daily=0']) {
+    assert.equal(safeAuthDestination(destination, '/'), '/');
+  }
+  const roomStudio = new URLSearchParams({ topic: 'Campus', prompt: 'I have studied here past midnight.', scene: 'library', template: 'animal-library-cat' });
+  assert.equal(safeAuthDestination(`/create?scene=library&topic=Campus&prompt=${encodeURIComponent('I have studied here past midnight.')}&template=animal-library-cat`, '/'), `/create?${roomStudio}`);
+  assert.equal(safeAuthDestination('/?scene=subway', '/'), '/?view=feed&location=EastVillage');
+  assert.equal(safeAuthDestination('/?scene=outside', '/'), '/');
+});
 
 test('untrusted prompt and topic validation', () => {
   for (const [prompt, topic] of [['short', 'Campus'], ['a'.repeat(501), 'NYC'], ['A valid scene here', 'Unknown'], [null, 'Campus'], [{ toString: () => 'forged scene' }, 'NYC']]) {
     assert.equal(validateScene(prompt, topic), null);
   }
-  assert.deepEqual(validateScene('  My laundry has its own zip code  ', 'Dorm life'), { prompt: 'My laundry has its own zip code', topic: 'Dorm life' });
+  assert.deepEqual(validateScene('  My laundry has its own zip code  ', 'Campus'), { prompt: 'My laundry has its own zip code', topic: 'Campus' });
 });
 
 test('only complete, bounded AI results are accepted', () => {
@@ -35,6 +51,8 @@ test('meme captions require short overlay text and descriptive alt text', () => 
 
 test('template selection accepts only the curated local catalog', () => {
   assert.equal(getTemplate('surprised-pikachu')?.name, 'Surprised Pikachu');
+  assert.equal(templateSrc(getTemplate('animal-library-cat')), '/room/animals/library-cat.webp');
+  assert.equal(templateSrc(getTemplate('animal-nyc-dog')), '/room/animals/subway-dog.webp');
   for (const id of ['../../.env.local', 'https://example.com/image.jpg', 'unknown', null, { id: 'surprised-pikachu' }]) {
     assert.equal(getTemplate(id), undefined);
   }

@@ -20,3 +20,16 @@ export async function vote(captionId: string, value: number): Promise<{ error?: 
   revalidatePath(`/captions/${captionId}`);
   return {};
 }
+
+export async function voteCuratedMeme(sampleId: string, value: number): Promise<{ error?: string; vote?: number | null; upvotes?: number }> {
+  if (!sampleId || sampleId.length > 80 || (value !== 1 && value !== -1)) return { error: "Choose a valid meme and vote." };
+  const supabase = await createClient();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  if (authError || !user) return { error: "Please sign in to vote." };
+  const { data, error } = await supabase.rpc("vote_curated_meme", { p_sample_id: sampleId, p_value: value });
+  const result = (data as unknown as { sample_id: string; my_vote: number | null; upvotes: number | string }[] | null)?.[0];
+  if (error || !result) return { error: "Your vote wasn't saved. Please try again." };
+  revalidatePath("/");
+  revalidatePath("/memes");
+  return { vote: result.my_vote, upvotes: Number(result.upvotes) };
+}

@@ -70,12 +70,13 @@ try {
     await page.getByLabel("Give it some context").fill(scene.prompt);
     await page.getByRole("button", { name: "Generate & publish meme" }).click();
     try {
-      await page.getByRole("link", { name: "See your meme & share it" }).waitFor({ timeout: 45_000 });
+      await page.getByText("Your recent attempts").click();
+      await page.getByRole("link", { name: "View meme" }).first().waitFor({ timeout: 45_000 });
     } catch {
       const message = await page.getByRole("status").allTextContents();
       throw new Error(`Starter generation did not finish: ${message.join(" ")}`);
     }
-    const href = await page.getByRole("link", { name: "See your meme & share it" }).getAttribute("href");
+    const href = await page.getByRole("link", { name: "View meme" }).first().getAttribute("href");
     console.log(`Published ${scene.topic} starter: ${new URL(href, origin).href}`);
   }
 } finally {

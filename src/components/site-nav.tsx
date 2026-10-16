@@ -1,20 +1,20 @@
-import Link from "next/link";
-import { Icon } from "@/components/icon";
+"use client";
 
-export function SiteNav({ signedIn, active }: { signedIn: boolean; active?: "feed" | "create" | "profile" }) {
-  return <nav aria-label="Main navigation" className="site-nav sticky top-0 z-40 mb-8 grid grid-cols-[1fr_auto] items-center gap-x-3 gap-y-4 py-5 md:grid-cols-[1fr_auto_1fr] md:py-6">
-    <Link href="/" aria-label="The Humor Project home" className="flex w-fit items-center gap-2.5"><Icon name="spark" className="hidden !size-6 min-[420px]:block" /><span className="text-lg font-semibold tracking-[-0.055em] sm:text-xl">humor<span className="ml-1.5 hidden font-normal text-accent min-[360px]:inline">project</span></span></Link>
-    <div className="nav-pill col-span-2 row-start-2 flex w-fit items-center justify-self-center rounded-full border border-accent-border bg-white p-1 text-xs font-medium md:col-span-1 md:col-start-2 md:row-start-1">
-      <Link href="/" aria-current={active === "feed" ? "page" : undefined} className={`rounded-full px-5 py-2 ${active === "feed" ? "bg-accent-selected text-accent-strong" : "text-accent hover:text-accent-strong"}`}>Discover</Link>
-      <Link href="/create" aria-current={active === "create" ? "page" : undefined} className={`rounded-full px-5 py-2 ${active === "create" ? "bg-accent-selected text-accent-strong" : "text-accent hover:text-accent-strong"}`}>Studio</Link>
-      {signedIn && <Link href="/profile" aria-current={active === "profile" ? "page" : undefined} className={`rounded-full px-5 py-2 md:hidden ${active === "profile" ? "bg-accent-selected text-accent-strong" : "text-accent"}`}>Profile</Link>}
+import Link from "next/link";
+import Image from "next/image";
+
+export function SiteNav({ signedIn, active, onRadioClick }: { signedIn: boolean; active?: "home" | "feed" | "create" | "profile"; onRadioClick?: () => void }) {
+  return <nav aria-label="Main navigation" className="site-nav sticky top-0 z-40 -mx-4 mb-4 flex min-h-[68px] items-center justify-between gap-x-5 px-4 sm:-mx-7 sm:px-7 lg:-mx-10 lg:px-10">
+    <div className="nav-left">
+      {onRadioClick ? <button type="button" aria-label="Choose a channel" aria-haspopup="dialog" className="radio-logo" onClick={onRadioClick}><Image src="/room/radio-v5.webp" alt="" width={92} height={62} preload /></button> : <Link href="/" aria-label="The Humor Project home" className="radio-logo"><Image src="/room/radio-v5.webp" alt="" width={58} height={40} /></Link>}
     </div>
-    <div className="col-start-2 row-start-1 flex items-center justify-self-end gap-3 text-xs font-medium md:col-start-3 md:gap-5 md:text-sm">
-      {signedIn ? <>
-        <Link href="/profile" className="hidden text-accent hover:text-foreground md:block">Profile</Link>
-        <form action="/auth/logout" method="post"><button className="whitespace-nowrap text-accent hover:text-foreground">Sign out</button></form>
-      </> : <a href="/auth/login" aria-label="Sign in with Google" className="whitespace-nowrap text-accent hover:text-foreground">Sign in</a>}
-      <Link href="/create" className="button-primary !min-h-9 !gap-1.5 !px-3 !py-2 !text-xs sm:!min-h-10 sm:!px-4 sm:!text-sm"><Icon name="plus" className="!size-3.5" />Make a meme</Link>
+    <div className="nav-center">
+      <Link href="/" aria-current={active === "home" ? "page" : undefined}>Home</Link>
+      <Link href="/memes" aria-current={active === "feed" ? "page" : undefined}>Browse</Link>
+      <Link href="/create" aria-current={active === "create" ? "page" : undefined}>Create</Link>
+    </div>
+    <div className="nav-account">
+      {signedIn ? <><Link href="/profile" aria-current={active === "profile" ? "page" : undefined}>Profile</Link><form action="/auth/logout" method="post"><button type="submit">Sign out</button></form></> : <a href="/auth/login" aria-label="Sign in with Google">Sign in</a>}
     </div>
   </nav>;
 }

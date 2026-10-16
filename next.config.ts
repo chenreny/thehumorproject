@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  outputFileTracingIncludes: { "/create": ["./public/meme-templates/*.jpg"] },
+  devIndicators: false,
+  outputFileTracingIncludes: { "/create": ["./public/meme-templates/*.jpg", "./public/room/animals/*.webp"] },
   experimental: { serverActions: { bodySizeLimit: "4mb" } },
 };
 

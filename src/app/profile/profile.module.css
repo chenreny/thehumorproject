@@ -1,0 +1,406 @@
+.profilePage {
+  min-height: 100vh;
+  background: radial-gradient(circle at 82% 18%, #253c61 0, #101a2f 46%);
+  color: #fff2dc;
+}
+
+.profileWrap {
+  width: min(1100px, calc(100% - 60px));
+  margin: 54px auto 0;
+}
+
+.heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 29px;
+}
+
+.heading h1,
+.card h2 {
+  margin: 0;
+  color: #fff2dc;
+  font-family: Georgia, "Times New Roman", serif;
+  letter-spacing: -0.045em;
+}
+
+.heading h1 {
+  margin: 0 0 8px;
+  font-size: clamp(43px, 5.4vw, 58px);
+  line-height: 1.04;
+}
+
+.kicker {
+  margin: 0 0 8px;
+  color: #ffd08c;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.subtitle {
+  margin: 0;
+  color: #c3cbda;
+  font-size: 14px;
+}
+
+.doodle {
+  padding: 0 4px 5px;
+  color: #ffb36e;
+  font: 42px Georgia, "Times New Roman", serif;
+  transform: rotate(-13deg);
+  white-space: nowrap;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.card {
+  position: relative;
+  min-height: 470px;
+  border: 1px solid #ead4b2;
+  border-radius: 20px;
+  background: #f8efdf;
+  padding: 31px 32px;
+  color: #172540;
+  box-shadow: 0 15px 35px rgb(6 16 38 / 40%);
+}
+
+.card::before {
+  position: absolute;
+  top: -13px;
+  left: 50%;
+  width: 96px;
+  height: 25px;
+  border-radius: 2px;
+  background: rgb(255 226 168 / 68%);
+  box-shadow: 0 1px 2px rgb(103 75 59 / 25%);
+  content: "";
+  transform: translateX(-50%) rotate(-3deg);
+}
+
+.photoCard::before {
+  transform: translateX(-50%) rotate(5deg);
+}
+
+.index {
+  display: inline-block;
+  margin-bottom: 20px;
+  border-radius: 100px;
+  background: #f6dfc8;
+  padding: 8px 13px;
+  color: #965744;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.card h2 {
+  color: #172540;
+  font-size: clamp(25px, 2.7vw, 31px);
+  line-height: 1.12;
+}
+
+.hint {
+  display: block;
+  color: #68758b;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.card > .hint {
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
+}
+
+.card :global(form.space-y-5) {
+  margin-top: 37px;
+}
+
+.card :global(form.space-y-5 > div) {
+  gap: 15px;
+}
+
+.card :global(label) {
+  color: #172540;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.card :global(.field) {
+  min-height: 45px;
+  border-color: #ccb99f;
+  border-radius: 9px;
+  background: #fffaf0;
+  padding: 0 14px;
+  color: #172540;
+  font-size: 14px;
+}
+
+.card :global(.field:focus-visible) {
+  outline-color: #ff785e;
+}
+
+.card :global(.button-primary) {
+  min-height: 43px;
+  border-radius: 9px;
+  padding: 0 18px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.card :global(form.space-y-5 > button) {
+  margin-top: 22px;
+}
+
+.card :global(form.space-y-5 p[role="status"]) {
+  color: #365c39;
+  font-size: 13px;
+}
+
+.card :global(form.space-y-5 p.text-accent-strong) {
+  color: #a13f34;
+  font-size: 13px;
+}
+
+.photoIdentity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 34px 0 23px;
+}
+
+.avatar {
+  display: grid;
+  width: 96px;
+  height: 96px;
+  flex: none;
+  place-items: center;
+  border: 5px solid #fff7e7;
+  border-radius: 50%;
+  background: #25406c;
+  color: #fff4df;
+  font: 700 34px Georgia, "Times New Roman", serif;
+  box-shadow: 0 0 0 2px #bfab8d;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  overflow: hidden;
+}
+
+.identityCopy {
+  min-width: 0;
+}
+
+.identityCopy strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #172540;
+  font-size: 16px;
+  overflow-wrap: anywhere;
+}
+
+.uploadForm {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.fileLabel {
+  max-width: 100%;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.fileInput {
+  display: block;
+  max-width: 100%;
+  color: #68758b;
+  font-size: 11px;
+}
+
+.fileInput::file-selector-button {
+  min-height: 43px;
+  margin-right: 12px;
+  border: 1px solid #cdb69d;
+  border-radius: 9px;
+  background: #fff9ed;
+  padding: 0 16px;
+  color: #172540;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.fileInput::file-selector-button:hover {
+  background: #fff2dc;
+}
+
+.photoNote {
+  margin: 16px 0 20px;
+}
+
+.uploadButton {
+  position: relative;
+  z-index: 1;
+}
+
+.successMessage,
+.errorMessage {
+  position: relative;
+  z-index: 1;
+  margin: 14px 0 0;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.successMessage {
+  color: #365c39;
+}
+
+.errorMessage {
+  color: #a13f34;
+}
+
+.catSticker {
+  position: absolute;
+  right: -47px;
+  bottom: -38px;
+  width: 144px;
+  height: 144px;
+  background-image: url("/room/playground/animal-sprites-v1.webp");
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  background-size: 300% 200%;
+  filter: drop-shadow(0 7px 5px rgb(7 20 38 / 44%));
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 28px;
+  color: #bcc9da;
+  font-size: 11px;
+}
+
+.footer span {
+  color: #ff9477;
+  font-size: 17px;
+}
+
+@media (max-width: 760px) {
+  .profilePage :global(.radio-logo) {
+    width: 66px;
+    height: 46px;
+  }
+
+  .profileWrap {
+    width: calc(100% - 34px);
+    margin-top: 38px;
+  }
+
+  .heading {
+    display: block;
+    margin-bottom: 26px;
+  }
+
+  .heading h1 {
+    font-size: 43px;
+  }
+
+  .subtitle {
+    line-height: 1.5;
+  }
+
+  .doodle {
+    display: none;
+  }
+
+  .cardGrid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 25px;
+  }
+
+  .card {
+    min-height: 0;
+    padding: 28px;
+  }
+
+  .card h2 {
+    font-size: 30px;
+  }
+
+  .card :global(form.space-y-5) {
+    margin-top: 25px;
+  }
+
+  .card :global(form.space-y-5 > div) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .card :global(form.space-y-5 > button) {
+    margin-top: 5px;
+  }
+
+  .photoCard {
+    padding-bottom: 85px;
+  }
+
+  .photoIdentity {
+    gap: 14px;
+    margin-top: 30px;
+  }
+
+  .avatar {
+    width: 92px;
+    height: 92px;
+  }
+
+  .catSticker {
+    right: 3px;
+    bottom: -23px;
+    width: 112px;
+    height: 112px;
+  }
+
+  .footer {
+    flex-wrap: wrap;
+    row-gap: 5px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 390px) {
+  .profileWrap {
+    width: calc(100% - 18px);
+  }
+
+  .card {
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+
+  .fileInput {
+    width: 100%;
+  }
+}
