@@ -5,5 +5,7 @@ site_url = "https://humanproject-hazel.vercel.app"
 additional_redirect_urls = [
   "http://localhost:3000/auth/callback",
   "https://humanproject-hazel.vercel.app/auth/callback",
+  "http://localhost:3001/auth/callback",
+  "https://humanproject-admin.vercel.app/auth/callback",
   "https://*-rc3502-1440.vercel.app/auth/callback",
 ]
