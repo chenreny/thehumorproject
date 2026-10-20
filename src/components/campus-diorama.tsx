@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 import { vote as saveVote, voteCuratedMeme as saveCuratedVote } from "@/app/vote-actions";
 import type { Caption } from "@/lib/captions";
 import { upvoteCount } from "@/lib/upvotes";
@@ -254,13 +254,25 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
 
   const isDogPhoto = selected !== null && !selected.caption && selected.image === dogPhotoImage;
   const sceneStyle = { "--region-x": `${region.x}%`, "--region-y": `${region.y}%` } as CSSProperties;
+  function returnHome(event: MouseEvent<HTMLAnchorElement>) {
+    if (!standaloneFeed) {
+      event.preventDefault();
+      if (feedOpen) {
+        updateFeedUrl(false, "all", true);
+        feedOpenedFromCity.current = false;
+        setFeedOpen(false);
+        setFeedLocation("all");
+      }
+      showMap();
+    }
+  }
   return <main className={styles.shell}>
     <a className={styles.skipLink} href={feedOpen ? "#feed-title" : "#meme-viewer"}>Skip to content</a>
     {signedIn && homeHref === "/" ? <header className={`${styles.hud} ${styles.sharedHud}`}>
       <nav className={styles.sharedNav} aria-label="Main navigation">
-        <Link href={homeHref} className={styles.brand} aria-label="The Humor Project home"><Image src="/room/radio-v5.webp" alt="" width={92} height={62} className={styles.brandImage} /></Link>
+        <Link href={homeHref} className={styles.brand} aria-label="The Humor Project home" onClick={returnHome}><Image src="/room/radio-v5.webp" alt="" width={92} height={62} className={styles.brandImage} /></Link>
         <div className={styles.sharedNavCenter}>
-          <Link href="/" aria-current={!feedOpen ? "page" : undefined}>Home</Link>
+          <Link href="/" aria-current={!feedOpen ? "page" : undefined} onClick={returnHome}>Home</Link>
           <Link ref={(element) => { allMemesRef.current = element; }} href="/memes" aria-current={feedOpen ? "page" : undefined}>Browse</Link>
           <Link href="/create" prefetch={false}>Create</Link>
         </div>
@@ -327,7 +339,6 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
             </div>
           </>}
         </div>
-        {view === "street" && <button type="button" className={styles.mapButton} onClick={showMap}><span aria-hidden="true">▱</span> Map</button>}
       </section>
 
       <aside className={styles.viewer} id="meme-viewer" tabIndex={-1} aria-label="Meme browser">

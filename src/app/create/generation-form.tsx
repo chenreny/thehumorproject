@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, type DragEvent } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { Icon } from "@/components/icon";
 import { MemeImage } from "@/components/meme-image";
@@ -17,30 +18,52 @@ export function GenerationForm({ dailyPrompt, useDaily, initialPrompt = "", init
   const [templateId, setTemplateId] = useState<string>(getTemplate(initialTemplateId)?.id ?? "disaster-girl");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showResult, setShowResult] = useState(true);
+  const [focusPromptOnEditor, setFocusPromptOnEditor] = useState(false);
   const [uploadPreview, setUploadPreview] = useState("");
   const [imageError, setImageError] = useState("");
   const editor = useRef<HTMLElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
   const resultPreview = useRef<HTMLDivElement>(null);
-  const generatedPreview = useRef<HTMLDivElement>(null);
+  const successHeading = useRef<HTMLHeadingElement>(null);
+  const promptInput = useRef<HTMLTextAreaElement>(null);
   useEffect(() => () => { if (uploadPreview) URL.revokeObjectURL(uploadPreview); }, [uploadPreview]);
   const [state, action, pending] = useActionState(generateCaption, { message: "" });
   useEffect(() => {
     if (!showResult || pending || (!state.message && !state.captionId)) return;
     const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
-    (state.captionId ? generatedPreview.current : resultPreview.current)?.scrollIntoView({ behavior, block: "center" });
+    (state.captionId ? editor.current : resultPreview.current)?.scrollIntoView({ behavior, block: "center" });
+    if (state.captionId) successHeading.current?.focus({ preventScroll: true });
   }, [showResult, pending, state.message, state.captionId]);
+  useEffect(() => {
+    if (!focusPromptOnEditor || showResult) return;
+    const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
+    editor.current?.scrollIntoView({ behavior, block: "center" });
+    promptInput.current?.focus({ preventScroll: true });
+    setFocusPromptOnEditor(false);
+  }, [focusPromptOnEditor, showResult]);
   const template = mode === "templates" ? getTemplate(templateId) : undefined;
   const preview = template ? templateSrc(template) : mode === "upload" ? uploadPreview : "";
   const previewImageClass = template
     ? template.id === "woman-yelling-at-cat"
       ? "object-contain p-3"
-      : `object-cover ${template.id === "surprised-pikachu" || template.id === "monkey-puppet" ? "object-bottom" : "object-center"}`
+      : template.id === "monkey-puppet"
+        ? "object-contain"
+      : `object-cover ${template.id === "surprised-pikachu" ? "object-bottom" : "object-center"}`
     : "object-contain p-3";
+  const previewCropClass = template?.id === "surprised-pikachu"
+    ? styles.pikachuCrop
+    : "";
   const filtered = MEME_TEMPLATES;
-  const generatedMeme = mode === "generate" && showResult && !pending && state.captionId && state.meme
+  const publishedMeme = showResult && !pending && state.captionId && state.meme
     ? { captionId: state.captionId, meme: state.meme }
     : null;
+
+  function makeAnotherMeme() {
+    setShowResult(false);
+    setPrompt("");
+    setImageError("");
+    setFocusPromptOnEditor(true);
+  }
 
   function chooseTemplate(id: string) {
     setTemplateId(id);
@@ -110,7 +133,7 @@ export function GenerationForm({ dailyPrompt, useDaily, initialPrompt = "", init
         {filtered.length ? <ul className={styles.templateGrid}>{filtered.map((item) => <li key={item.id}>
           <button type="button" disabled={pending} aria-pressed={templateId === item.id} aria-label={`Use ${item.name}`} onClick={() => chooseTemplate(item.id)} className={`${styles.templateTile} template-tile group block w-full text-left disabled:opacity-50`}>
             <div className={`${styles.templateArt} template-art relative isolate aspect-video w-full overflow-hidden rounded-2xl bg-accent-surface`}>
-              <Image src={templateSrc(item)} alt={item.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px" className={`${item.id === "surprised-pikachu" || item.id === "monkey-puppet" || item.id === "woman-yelling-at-cat" ? "object-cover object-bottom" : "object-cover object-center"} ${item.id === "woman-yelling-at-cat" ? "origin-bottom scale-[1.2]" : ""} mix-blend-multiply`} />
+              <Image src={templateSrc(item)} alt={item.name} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 280px" className={`${item.id === "monkey-puppet" ? "object-contain" : item.id === "surprised-pikachu" || item.id === "woman-yelling-at-cat" ? "object-cover object-bottom" : "object-cover object-center"} ${item.id === "woman-yelling-at-cat" ? "origin-bottom scale-[1.2]" : ""} mix-blend-multiply`} />
               <span className={`${styles.templateCheck} absolute bottom-3 right-3 grid size-7 place-items-center rounded-full transition-opacity ${templateId === item.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}><Icon name={templateId === item.id ? "check" : "plus"} className="!size-3.5" /></span>
             </div>
             <div className={styles.templateMeta}><p>{item.name}</p><span>{item.category}</span></div>
@@ -138,19 +161,27 @@ export function GenerationForm({ dailyPrompt, useDaily, initialPrompt = "", init
     </section>
 
     <section aria-label="Selected picture preview" className={styles.previewPanel}>
-      <div className={styles.previewHeader}><span>{template ? "Your selected picture" : selectedFile ? "Your uploaded picture" : mode === "generate" ? "AI picture preview" : "Picture preview"}</span>{template && <span className={styles.previewBadge}>{template.name}</span>}{selectedFile && <span className={styles.previewBadge}>Your picture</span>}</div>
-      <div className={`${styles.previewArt} ${preview ? "" : styles.previewEmpty}`}>
-        {preview ? <Image src={preview} alt={template ? `Selected template: ${template.name}` : "Your selected meme photo"} fill unoptimized={mode === "upload"} sizes="(max-width: 900px) 100vw, 50vw" className={`${previewImageClass} mix-blend-multiply`} /> : mode === "generate" && generatedMeme ? <div ref={generatedPreview} className="absolute inset-0"><MemeImage className="h-full aspect-auto rounded-none" src={`/captions/${generatedMeme.captionId}/image`} description={generatedMeme.meme.imageDescription} top={generatedMeme.meme.setup} bottom={generatedMeme.meme.punchline} /></div> : <div className={styles.previewEmptyCopy}><Icon name={mode === "generate" ? "spark" : "image"} className="!size-8" /><p>{mode === "generate" ? "Your original image will appear here" : "Choose a picture to see it here"}</p></div>}
+      <div className={styles.previewHeader}><span>{publishedMeme ? "Your finished meme" : template ? "Your selected picture" : selectedFile ? "Your uploaded picture" : mode === "generate" ? "AI picture preview" : "Picture preview"}</span>{!publishedMeme && template && <span className={styles.previewBadge}>{template.name}</span>}{!publishedMeme && selectedFile && <span className={styles.previewBadge}>Your picture</span>}</div>
+      <div className={`${styles.previewArt} ${preview || publishedMeme ? "" : styles.previewEmpty}`}>
+        {publishedMeme ? <div className="absolute inset-0"><MemeImage className="h-full aspect-auto rounded-none" src={`/captions/${publishedMeme.captionId}/image`} description={publishedMeme.meme.imageDescription} top={publishedMeme.meme.setup} bottom={publishedMeme.meme.punchline} /></div> : preview ? <div className={`${styles.previewImageWrap} ${previewCropClass}`}><Image src={preview} alt={template ? `Selected template: ${template.name}` : "Your selected meme photo"} fill unoptimized={mode === "upload"} sizes="(max-width: 900px) 100vw, 50vw" className={`${previewImageClass} mix-blend-multiply`} /></div> : <div className={styles.previewEmptyCopy}><Icon name={mode === "generate" ? "spark" : "image"} className="!size-8" /><p>{mode === "generate" ? "Your original image will appear here" : "Choose a picture to see it here"}</p></div>}
       </div>
-      {!template && <div className={styles.previewFoot}><span>{selectedFile ? selectedFile.name : mode === "generate" ? "AI will create an image from your prompt." : "Select a template or upload a picture to get started."}</span></div>}
+      {(!template || publishedMeme) && <div className={styles.previewFoot}><span>{publishedMeme ? "Your meme has been published to the gallery." : selectedFile ? selectedFile.name : mode === "generate" ? "AI will create an image from your prompt." : "Select a template or upload a picture to get started."}</span></div>}
     </section>
 
-    <section ref={editor} id="meme-editor" aria-labelledby="editor-title" className={`${styles.editor} studio-editor min-w-0 scroll-mt-36`}>
+    {publishedMeme ? <section ref={editor} aria-labelledby="success-title" role="status" className={`${styles.editor} ${styles.successPanel} min-w-0`}>
+      <span aria-hidden="true" className={styles.successCheck}><Icon name="check" className="!size-7" /></span>
+      <span className={styles.successKicker}>PUBLISHED SUCCESSFULLY</span>
+      <h2 ref={successHeading} id="success-title" tabIndex={-1}>Your meme is live!</h2>
+      <p>Nice work. It’s saved in your gallery and ready to share.</p>
+      <Link href="/memes" className={`${styles.successPrimary} button-primary`}>View your meme <span aria-hidden="true">↗</span></Link>
+      <button type="button" onClick={makeAnotherMeme} className={styles.successSecondary}>Make another meme</button>
+      <div className={styles.successStamp}><span aria-hidden="true">✓</span> Created just now<br />Find this meme again in Your recent attempts.</div>
+    </section> : <section ref={editor} id="meme-editor" aria-labelledby="editor-title" className={`${styles.editor} studio-editor min-w-0 scroll-mt-36`}>
       <div className={styles.editorHeader}><div><span className={styles.editorEyebrow}>ADD YOUR MOMENT</span><h2 id="editor-title">{mode === "generate" ? "Describe the picture" : "What happened?"}</h2><p>{mode === "generate" ? "We’ll make the picture and write a caption." : "Give us the details you’d tell the group chat."}</p></div><Icon name="spark" /></div>
       <div className="space-y-4">
         <div><label htmlFor="topic" className="mb-2 block text-xs font-medium text-foreground">Pick your territory</label><select id="topic" name="topic" value={topic} onChange={(event) => setTopic(event.target.value)} className="field !py-2.5" disabled={pending}>{TOPICS.map((item) => <option key={item} value={item}>{topicLabel(item)}</option>)}</select></div>
         <div><div className="mb-2 flex flex-wrap justify-between gap-2"><label htmlFor="prompt" className="text-xs font-medium text-foreground">{mode === "generate" ? "Describe the image and moment" : "Give it some context"}</label><button type="button" onClick={() => setPrompt(dailyPrompt)} disabled={pending} className="text-[11px] text-accent underline decoration-accent-border-strong underline-offset-4">Use today’s inspiration</button></div>
-          <textarea id="prompt" name="prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} required minLength={10} maxLength={500} rows={4} disabled={pending} aria-describedby="prompt-help" placeholder={mode === "generate" ? "What should the image show? A specific campus or NYC moment works best." : "What’s the situation? A specific campus or NYC moment works best."} className="field resize-y !leading-relaxed" />
+          <textarea ref={promptInput} id="prompt" name="prompt" value={prompt} onChange={(event) => setPrompt(event.target.value)} required minLength={10} maxLength={500} rows={4} disabled={pending} aria-describedby="prompt-help" placeholder={mode === "generate" ? "What should the image show? A specific campus or NYC moment works best." : "What’s the situation? A specific campus or NYC moment works best."} className="field resize-y !leading-relaxed" />
           <p id="prompt-help" className="mt-1.5 text-right text-[10px] text-accent">{prompt.length}/500</p>
         </div>
         {signedIn ? <>
@@ -158,7 +189,7 @@ export function GenerationForm({ dailyPrompt, useDaily, initialPrompt = "", init
           <p className="text-center text-[10px] leading-relaxed text-accent">10 attempts per rolling 24 hours, including unsuccessful attempts.</p>
         </> : <div className="border-t border-accent-border pt-4"><p className="mb-3 text-xs leading-relaxed text-accent">Sign in to turn this into a meme.</p><a href="/auth/login?next=/create" className="button-primary w-full">Continue with Google</a></div>}
       </div>
-    </section>
+    </section>}
   </form>
   {showResult && !pending && state.message && !state.captionId && <div ref={resultPreview} role="status" className={`${styles.resultMessage} mx-auto mt-8 w-full max-w-xl rounded-2xl border p-5 text-sm leading-relaxed`}>
     {state.message}

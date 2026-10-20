@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import sharp from "sharp";
 import { revalidatePath } from "next/cache";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -67,8 +68,21 @@ export async function generateCaption(_previous: GenerationState, formData: Form
   if (!apiKey || !serviceKey) return { message: "The meme generator is not connected yet. Please try again later." };
   let imageBytes: Buffer | undefined;
   if (imageSource === "provided" && file) {
-    try { imageBytes = await normalizeMemeImage(file); }
-    catch { return { message: "That image couldn't be opened. Use a still JPEG, PNG, or WebP under 3 MB and at least 64 pixels wide and tall." }; }
+    try {
+      imageBytes = await normalizeMemeImage(file);
+      const topCropFraction = template?.id === "surprised-pikachu"
+        ? 760 / 1892
+        : 0;
+      if (topCropFraction) {
+        const { width, height } = await sharp(imageBytes).metadata();
+        if (!width || !height) throw new Error("Missing image dimensions");
+        const top = Math.floor(height * topCropFraction);
+        imageBytes = await sharp(imageBytes)
+          .extract({ left: 0, top, width, height: height - top })
+          .jpeg({ quality: 85 })
+          .toBuffer();
+      }
+    } catch { return { message: "That image couldn't be opened. Use a still JPEG, PNG, or WebP under 3 MB and at least 64 pixels wide and tall." }; }
   }
   const model = process.env.OPENAI_MODEL || "gpt-6-luna";
   const admin = createSupabaseClient(supabaseConfig().url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
