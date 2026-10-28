@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     "test-results/**",
     "playwright-report/**",
+    // A separate app checkout may live inside the workspace; it is not part of this app.
+    "funnystudy/**",
   ]),
 ]);
 

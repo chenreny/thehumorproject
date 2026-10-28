@@ -10,6 +10,7 @@ import { normalizeMemeImage } from "@/lib/meme-image";
 import { imageFileError } from "@/lib/media";
 import { SYSTEM_PROMPT, parseMemeCaption, topicLabel, validateScene } from "@/lib/generation";
 import { getTemplate } from "@/lib/templates";
+import { bestEffortGenerationLog } from "@/lib/generation-logging";
 
 export type GenerationState = {
   message: string;
@@ -106,6 +107,7 @@ export async function generateCaption(_previous: GenerationState, formData: Form
     if (uploadError) throw new Error("Image upload failed");
     const { error: imageError } = await admin.from("generation_requests").update({ image_path: imagePath, template_id: template?.id ?? null }).eq("id", requestId);
     if (imageError) throw new Error("Image reference save failed");
+    const responseStartedAt = Date.now();
     const response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
       cache: "no-store", signal: AbortSignal.timeout(30_000),
@@ -129,6 +131,14 @@ export async function generateCaption(_previous: GenerationState, formData: Form
       .flatMap((item: { content: { type: string; text?: string }[] }) => item.content)
       .filter((part: { type: string }) => part.type === "output_text")
       .map((part: { text?: string }) => part.text ?? "").join("");
+    await bestEffortGenerationLog(() => admin.from("generation_llm_responses").insert({
+      generation_id: requestId,
+      model,
+      status: "completed",
+      response_text: text ?? "",
+      processing_time_ms: Math.max(0, Date.now() - responseStartedAt),
+      created_by_user_id: user.id,
+    }));
     const caption = parseMemeCaption(text ?? "");
     meme = { setup: caption.setup, punchline: caption.punchline, imageDescription: caption.image_description };
     const { data, error } = await admin.rpc("complete_meme_generation", {

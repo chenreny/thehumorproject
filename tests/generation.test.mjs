@@ -3,6 +3,7 @@ import test from 'node:test';
 import { getTemplate, MEME_TEMPLATES, templateSrc } from '../src/lib/templates.ts';
 import { validateScene, parseCaption, parseMemeCaption, dailyScene } from '../src/lib/generation.ts';
 import { safeAuthDestination } from '../src/lib/auth-redirect.ts';
+import { bestEffortGenerationLog } from '../src/lib/generation-logging.ts';
 
 test('studio context survives sign-in without allowing external redirects', () => {
   const query = new URLSearchParams({ topic: 'Campus', prompt: 'My laundry pile now wants to split the rent.' });
@@ -57,4 +58,17 @@ test('template selection accepts only the curated local catalog', () => {
     assert.equal(getTemplate(id), undefined);
   }
   assert.equal(new Set(MEME_TEMPLATES.map(template => template.id)).size, MEME_TEMPLATES.length);
+});
+
+test('optional generation response logging cannot fail generation', async () => {
+  const inserted = [];
+  const client = { from: table => ({ insert: async row => {
+    assert.equal(table, 'generation_llm_responses');
+    inserted.push(row);
+    return { error: null };
+  } }) };
+  assert.equal(await bestEffortGenerationLog(() => client.from('generation_llm_responses').insert({ response_text: 'raw response' })), true);
+  assert.deepEqual(inserted, [{ response_text: 'raw response' }]);
+  assert.equal(await bestEffortGenerationLog(() => Promise.resolve({ error: new Error('migration not applied') })), false);
+  assert.equal(await bestEffortGenerationLog(() => { throw new Error('database unavailable'); }), false);
 });

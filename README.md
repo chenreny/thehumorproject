@@ -64,6 +64,7 @@ Migrations preserve existing jokes and profiles and create:
 | `profiles` | Owner only | Owner can update profile fields only |
 | `generation_requests` | Owner only, including prompts | Server only |
 | `captions` | Signed-in captions, image reference, and image alt text | Server only |
+| `generation_llm_responses` | Service role only; raw text model output and processing time | Server only, best effort |
 | `meme-images` Storage bucket | Owner before publication; signed-in readers after publication | Server only |
 | `caption_votes` | Owner only | Authenticated owner inserts; updates only `value` |
 
@@ -92,6 +93,13 @@ stored image belonging to that exact user and generation request. The exact syst
 and model are saved before the provider request; the user message sent to OpenAI
 is `Topic: {topic}\nScene: {prompt}`, accompanied by the normalized photo. Missing keys and provider failures produce
 recoverable UI messages instead of publishing placeholder results.
+
+After the text response returns, the server attempts to save its raw output and
+elapsed time to `generation_llm_responses`. Logging is best effort: missing table
+access or a write failure does not interrupt meme generation. The table has RLS
+enabled and is accessible only through the server's service role. Apply
+`20261028010000_generation_llm_responses.sql` through the root migration chain to
+enable persistent response history.
 
 `caption_feed` intentionally uses a fixed, read-only SECURITY DEFINER function
 to return member captions and aggregate scores without exposing voter IDs. It

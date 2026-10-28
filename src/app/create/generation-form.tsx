@@ -18,7 +18,7 @@ export function GenerationForm({ dailyPrompt, useDaily, initialPrompt = "", init
   const [templateId, setTemplateId] = useState<string>(getTemplate(initialTemplateId)?.id ?? "disaster-girl");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showResult, setShowResult] = useState(true);
-  const [focusPromptOnEditor, setFocusPromptOnEditor] = useState(false);
+  const focusPromptOnEditor = useRef(false);
   const [uploadPreview, setUploadPreview] = useState("");
   const [imageError, setImageError] = useState("");
   const editor = useRef<HTMLElement>(null);
@@ -35,12 +35,12 @@ export function GenerationForm({ dailyPrompt, useDaily, initialPrompt = "", init
     if (state.captionId) successHeading.current?.focus({ preventScroll: true });
   }, [showResult, pending, state.message, state.captionId]);
   useEffect(() => {
-    if (!focusPromptOnEditor || showResult) return;
+    if (!focusPromptOnEditor.current || showResult) return;
     const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth";
     editor.current?.scrollIntoView({ behavior, block: "center" });
     promptInput.current?.focus({ preventScroll: true });
-    setFocusPromptOnEditor(false);
-  }, [focusPromptOnEditor, showResult]);
+    focusPromptOnEditor.current = false;
+  }, [showResult]);
   const template = mode === "templates" ? getTemplate(templateId) : undefined;
   const preview = template ? templateSrc(template) : mode === "upload" ? uploadPreview : "";
   const previewImageClass = template
@@ -62,7 +62,7 @@ export function GenerationForm({ dailyPrompt, useDaily, initialPrompt = "", init
     setShowResult(false);
     setPrompt("");
     setImageError("");
-    setFocusPromptOnEditor(true);
+    focusPromptOnEditor.current = true;
   }
 
   function chooseTemplate(id: string) {
