@@ -478,6 +478,8 @@ export function CaptionVoteFlow({
   }, [queue.length]);
 
   useEffect(() => {
+    // The route's caption snapshot resets this in-progress run when it changes.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setQueue(captions);
     setVoteStatuses(createPersistedVoteStatusLookup(captions));
     setIsCompletionPageVisible(false);
@@ -1442,6 +1444,8 @@ export function CaptionVoteFlow({
       return;
     }
 
+    // Record a caption view when navigation makes it current.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessionStudyStats((previousStats) =>
       previousStats.viewedCaptionKeys[currentVoteKey]
         ? previousStats
@@ -1475,6 +1479,8 @@ export function CaptionVoteFlow({
       return;
     }
 
+    // Fetch the next batch as the viewer approaches the end of the queue.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadMoreCaptions(nextCaptionOffset);
   }, [
     currentIndex,
