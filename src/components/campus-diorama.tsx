@@ -7,6 +7,7 @@ import { vote as saveVote, voteCuratedMeme as saveCuratedVote } from "@/app/vote
 import type { Caption } from "@/lib/captions";
 import { upvoteCount } from "@/lib/upvotes";
 import { Icon } from "@/components/icon";
+import { CityBanner } from "@/components/city-banner";
 import styles from "./campus-diorama.module.css";
 
 type RegionId = "campus" | "ktown" | "east-village";
@@ -27,19 +28,19 @@ type Sample = { id: string; region: RegionId; theme: ThemeId; image: string; top
 type Reaction = { region: RegionId; theme?: ThemeId; kind: "laugh" | "browse"; key: number };
 
 const regions: readonly Region[] = [
-  { id: "campus", name: "Campus", title: "Campus memes", scene: "campus-night-v1.webp", x: 53, y: 18, themes: ["study", "dorm"], hotspotPositions: [{ x: 32, y: 58 }, { x: 77, y: 66 }], spritePosition: "50% 0%" },
-  { id: "ktown", name: "Ktown", title: "Ktown memes", scene: "ktown-night-v1.webp", x: 55, y: 53, themes: ["late-bites", "karaoke"], hotspotPositions: [{ x: 32, y: 58 }, { x: 77, y: 66 }], spritePosition: "0% 0%" },
-  { id: "east-village", name: "East Village", title: "East Village memes", scene: "east-village-night-v1.webp", x: 65, y: 65, themes: ["cheap-eats", "live-music"], hotspotPositions: [{ x: 32, y: 58 }, { x: 77, y: 66 }], spritePosition: "100% 0%" },
+  { id: "campus", name: "Campus", title: "Campus memes", scene: "campus-night-v1.webp", x: 55.6, y: 18.4, themes: ["study", "dorm"], hotspotPositions: [{ x: 32, y: 58 }, { x: 77, y: 66 }], spritePosition: "50% 0%" },
+  { id: "ktown", name: "Ktown", title: "Ktown memes", scene: "ktown-night-v1.webp", x: 58, y: 51.9, themes: ["late-bites", "karaoke"], hotspotPositions: [{ x: 32, y: 58 }, { x: 77, y: 66 }], spritePosition: "0% 0%" },
+  { id: "east-village", name: "East Village", title: "East Village memes", scene: "east-village-night-v1.webp", x: 70, y: 65.2, themes: ["cheap-eats", "live-music"], hotspotPositions: [{ x: 32, y: 58 }, { x: 77, y: 66 }], spritePosition: "100% 0%" },
 ];
 
 const themes: Record<ThemeId, { label: string; icon: string }> = {
-  study: { label: "Study", icon: "✦" }, dorm: { label: "Dorm life", icon: "⌂" },
+  study: { label: "Study break", icon: "✦" }, dorm: { label: "Dorm life", icon: "⌂" },
   "late-bites": { label: "Late bites", icon: "♨" }, karaoke: { label: "Karaoke", icon: "♫" },
   "cheap-eats": { label: "Cheap eats", icon: "♨" }, "live-music": { label: "Live music", icon: "♫" },
 };
 
 const samples: readonly Sample[] = [
-  { id: "campus-food-midnight", region: "campus", theme: "study", image: "/room/animals/library-cat.webp", top: "STUDY GROUP AT THE LIBRARY", bottom: "WE HAVE OPENED ONE SLIDE IN 40 MINUTES", alt: "Cat guarding a late campus study session" },
+  { id: "campus-food-midnight", region: "campus", theme: "study", image: "/room/animals/library-cat.webp", top: "STUDY GROUP AT THE LIBRARY", bottom: "ONE SLIDE. FORTY MINUTES.", alt: "Cat guarding a late campus study session" },
   { id: "campus-all-dorm", region: "campus", theme: "dorm", image: "/room/animals/dorm-cat.webp", top: "LIGHTS OUT AT 12", bottom: "GROUP PROJECT CALL AT 12:01", alt: "Cat among dorm room laundry" },
   { id: "campus-study-harold", region: "campus", theme: "study", image: "/meme-templates/hide-the-pain-harold.jpg", top: "STUDY PLAN: START AT 7", bottom: "IT'S 7:03 AND I'M IN THE SNACK DRAWER", alt: "Two-panel smiling man working at a laptop", template: "hide-the-pain-harold" },
   { id: "campus-dorm-disaster", region: "campus", theme: "dorm", image: "/meme-templates/disaster-girl.jpg", top: "THE DORM FIRE ALARM GOES OFF AGAIN", bottom: "WE ARE ALL GOING BACK TO SLEEP", alt: "Smiling girl with a fire engine in the background", template: "disaster-girl" },
@@ -58,7 +59,7 @@ const samples: readonly Sample[] = [
 const assetRoot = "/room/playground/nyc/";
 const dogPhotoImage = "/room/animals/subway-dog.webp";
 const locationOptions: readonly { id: FeedLocation; label: string }[] = [
-  { id: "all", label: "All locations" }, { id: "Campus", label: "Campus" }, { id: "Ktown", label: "Ktown" }, { id: "EastVillage", label: "East Village" },
+  { id: "all", label: "Everywhere" }, { id: "Campus", label: "Campus" }, { id: "Ktown", label: "Ktown" }, { id: "EastVillage", label: "East Village" },
 ];
 
 function readLocation(value: string | undefined): FeedLocation {
@@ -86,6 +87,8 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
   const [reaction, setReaction] = useState<Reaction | null>(null);
   const [feedOpen, setFeedOpen] = useState(initialFeed);
   const [feedLocation, setFeedLocation] = useState<FeedLocation>(initialLocation);
+  const [wallQuery, setWallQuery] = useState("");
+  const [wallSort, setWallSort] = useState<"loved" | "new">("loved");
   const reactionKey = useRef(0);
   const feedOpenedFromCity = useRef(false);
   useEffect(() => {
@@ -136,7 +139,7 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
   const sampleRating = selected ? ratings[selected.id] ?? 0 : 0;
   const collectionTitle = themeId ? themes[themeId].label : collectionRegion === null ? "NYC memes" : regions.find((item) => item.id === collectionRegion)!.title;
   const feedRegion = feedLocation === "Campus" ? "campus" : feedLocation === "Ktown" ? "ktown" : feedLocation === "EastVillage" ? "east-village" : null;
-  const feedSamples = useMemo(() => allSamples.filter((item) => feedRegion === null || item.region === feedRegion), [allSamples, feedRegion]);
+  const feedSamples = useMemo(() => allSamples.filter((item) => (feedRegion === null || item.region === feedRegion) && `${item.top} ${item.bottom} ${item.region} ${themes[item.theme].label}`.toLowerCase().includes(wallQuery.trim().toLowerCase())).sort((a, b) => wallSort === "loved" ? ((b.caption?.score ?? sampleUpvoteCounts[b.id] ?? 0) - (a.caption?.score ?? sampleUpvoteCounts[a.id] ?? 0)) : ((Date.parse(b.caption?.created_at ?? "") || 0) - (Date.parse(a.caption?.created_at ?? "") || 0))), [allSamples, feedRegion, wallQuery, wallSort, sampleUpvoteCounts]);
 
   const updateFeedUrl = useCallback((open: boolean, location: FeedLocation, replace = false) => {
     const url = new URL(window.location.href);
@@ -268,31 +271,22 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
   }
   return <main className={styles.shell}>
     <a className={styles.skipLink} href={feedOpen ? "#feed-title" : "#meme-viewer"}>Skip to content</a>
-    {signedIn && homeHref === "/" ? <header className={`${styles.hud} ${styles.sharedHud}`}>
+    {signedIn && homeHref === "/" ? <CityBanner active={feedOpen ? "wall" : "city"} homeHref={homeHref} onExplore={returnHome} memeLinkRef={(element) => { allMemesRef.current = element; }} /> : <header className={styles.hud}>
       <nav className={styles.sharedNav} aria-label="Main navigation">
-        <Link href={homeHref} className={styles.brand} aria-label="The Humor Project home" onClick={returnHome}><Image src="/room/radio-v5.webp" alt="" width={92} height={62} className={styles.brandImage} /></Link>
-        <div className={styles.sharedNavCenter}>
-          <Link href="/" aria-current={!feedOpen ? "page" : undefined} onClick={returnHome}>Home</Link>
-          <Link ref={(element) => { allMemesRef.current = element; }} href="/memes" aria-current={feedOpen ? "page" : undefined}>Browse</Link>
-          <Link href="/create" prefetch={false}>Create</Link>
-        </div>
-        <div className={styles.sharedAccount}>
-          <Link href="/profile">Profile</Link>
-          <form action="/auth/logout" method="post"><button type="submit">Sign out</button></form>
-        </div>
+        <Link href={homeHref} className={styles.brand} aria-label="The Humor Project home"><Image src="/room/radio-v5.webp" alt="" width={92} height={62} className={styles.brandImage} /></Link>
+        <div className={styles.sharedNavCenter}><Link href={homeHref} aria-current={!feedOpen ? "page" : undefined}>Explore the city</Link><button ref={(element) => { allMemesRef.current = element; }} type="button" aria-current={feedOpen ? "page" : undefined} onClick={openFeed}>Meme wall</button><Link href="/create" prefetch={false}>Studio</Link></div>
+        <div className={styles.sharedAccount}><Link className={styles.createPill} href="/create" prefetch={false}><span aria-hidden="true">＋</span> Create a meme</Link>{signedIn ? <Link className={`${styles.avatarLink} ${styles.profileLink}`} href="/profile" aria-label="Your profile">Profile</Link> : <Link className={styles.avatarLink} href="/auth/login" aria-label="Sign in">↗</Link>}</div>
       </nav>
-    </header> : <header className={styles.hud}>
-      <Link href={homeHref} className={styles.brand} aria-label="The Humor Project home" onClick={(event) => { if (feedOpen && !standaloneFeed) { event.preventDefault(); closeFeed(); } }}><Image src="/room/radio-v5.webp" alt="" width={92} height={62} className={styles.brandImage} /></Link>
-      <nav className={styles.hudActions} aria-label="Browse navigation">{feedOpen ? <button type="button" className={styles.backToCity} onClick={closeFeed}>← Back to city</button> : <button ref={(element) => { allMemesRef.current = element; }} type="button" className={styles.allMemesTop} onClick={openFeed}>All memes</button>}<Link className={styles.createLink} href="/create" prefetch={false}>Create meme <span aria-hidden="true">✦</span></Link>{signedIn && <><Link className={styles.accountLink} href="/profile">Profile</Link><form action="/auth/logout" method="post"><button className={styles.accountLink} type="submit">Sign out</button></form></>}</nav>
     </header>}
 
-    {feedOpen ? <section className={`${styles.feedPage} ${standaloneFeed ? styles.standaloneFeed : ""}`} aria-labelledby="feed-title">
-      <header className={styles.feedIntro}>{standaloneFeed ? <div className={styles.wallLeadTitle}><h1 id="feed-title" ref={feedTitleRef} tabIndex={-1}>The meme wall.</h1></div> : <><p className={styles.eyebrow}>THE HUMOR PROJECT / BROWSE</p><h1 id="feed-title" ref={feedTitleRef} tabIndex={-1}>All memes</h1><p>Every late night, every neighborhood. Pick a place and browse the whole wall.</p></>}{signedIn && homeHref === "/" && !standaloneFeed && <button type="button" className={styles.feedBack} onClick={closeFeed}>← Back to city</button>}</header>
-      <nav className={styles.locationFilters} aria-label="Filter memes by location">{locationOptions.map((option) => {
+    {feedOpen ? <section className={`${styles.feedPage} ${styles.standaloneFeed}`} aria-labelledby="feed-title">
+      <header className={styles.feedIntro}><div className={styles.wallLeadTitle}><p className={styles.eyebrow}>ALL THE STOPS. ALL THE STORIES.</p><h1 id="feed-title" ref={feedTitleRef} tabIndex={-1}>The city&apos;s <em>group chat.</em></h1><p>Campus chaos, midnight cravings, and everything in between.</p></div>{(standaloneFeed || homeHref !== "/") && <Link href={homeHref} className={styles.feedBack}>⌖ &nbsp; Back to the city</Link>}{signedIn && homeHref === "/" && !standaloneFeed && <button type="button" className={styles.feedBack} onClick={closeFeed}>← Back to city</button>}</header>
+      <div className={styles.wallTools}><nav className={styles.locationFilters} aria-label="Filter memes by location">{locationOptions.map((option) => {
         const optionRegion = option.id === "Campus" ? "campus" : option.id === "Ktown" ? "ktown" : option.id === "EastVillage" ? "east-village" : null;
         const count = optionRegion === null ? allSamples.length : allSamples.filter((item) => item.region === optionRegion).length;
         return <button key={option.id} type="button" onClick={() => selectFeedLocation(option.id)} aria-pressed={feedLocation === option.id}>{option.label}<span>{count}</span></button>;
-      })}</nav>
+      })}</nav><div className={styles.wallSearch}><label className={styles.srOnly} htmlFor="wall-search">Find your kind of funny</label><input id="wall-search" value={wallQuery} onChange={(event) => setWallQuery(event.target.value)} placeholder="⌕  Find your kind of funny" /><label className={styles.srOnly} htmlFor="wall-sort">Sort memes</label><select id="wall-sort" value={wallSort} onChange={(event) => setWallSort(event.target.value as "loved" | "new")}><option value="loved">Most loved</option><option value="new">Newest</option></select></div></div>
+      <div className={styles.wallMeta}><span>{feedSamples.length} memes from across the city</span><span>GOOD FOR A STUDY BREAK. BAD FOR YOUR SCREEN TIME.</span></div>
       {feedError && <p className={styles.feedError} role="alert">Some memes could not be fully loaded. Please refresh to try again.</p>}
       {feedSamples.length ? <div className={styles.memeGrid}>{feedSamples.map((item) => {
         const rating = item.caption ? captionRatings[item.caption.id] ?? 0 : ratings[item.id] ?? 0;
@@ -308,8 +302,9 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
           {item.caption ? captionVoteErrors[item.caption.id] && <span role="alert">{captionVoteErrors[item.caption.id]}</span> : sampleVoteErrors[item.id] && <span role="alert">{sampleVoteErrors[item.id]}</span>}
         </div>;
         return <article className={styles.feedCard} key={item.id}>
+          <div className={styles.wallCardLabel}><span>⌖ &nbsp;{regions.find((place) => place.id === item.region)?.name}</span><span>{themes[item.theme].label}</span></div>
           {item.caption ? <div className={`${styles.feedImage} ${styles.memberMeme}`}>{item.caption.image_path && <Image src={item.caption.image_url ?? `/captions/${item.caption.id}/image`} alt={item.caption.image_description || "Published meme image"} fill unoptimized sizes={standaloneFeed ? "(max-width: 600px) 50vw, (max-width: 1100px) 33vw, 25vw" : "(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 33vw"} />}<span className={styles.memeTop}>{item.top}</span><span className={styles.memeBottom}>{item.bottom}</span></div> : <div className={`${styles.feedImage} ${isDogPhoto ? styles.dogPhotoFeed : ""}`}><Image src={item.image} alt={item.alt} fill sizes={standaloneFeed ? "(max-width: 600px) 50vw, (max-width: 1100px) 33vw, 25vw" : "(max-width: 600px) 100vw, (max-width: 1000px) 50vw, 33vw"} className={item.template ? styles.templateImage : undefined} /><span className={styles.memeTop}>{item.top}</span><span className={styles.memeBottom}>{item.bottom}</span></div>}
-          {standaloneFeed ? <div className={styles.wallCardFoot}>{ratingControls}</div> : ratingControls}
+          <><div className={styles.wallCardFoot}><span>{item.caption ? "Community submission" : "The Humor Project"}</span></div>{ratingControls}</>
         </article>;
       })}</div> : <p className={styles.emptyFeed}>No memes in this location yet.</p>}
     </section> : <div className={styles.experience}>
@@ -318,21 +313,28 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
           <div className={`${styles.scene} ${styles.mapScene}`} aria-hidden="true" />
           {regions.map((item) => <div key={item.id} className={`${styles.scene} ${styles.streetScene} ${view === "street" && regionId === item.id ? styles.streetSceneActive : ""}`} style={{ backgroundImage: `url("${assetRoot}${item.scene}")` }} aria-hidden="true" />)}
           <div className={styles.sceneShade} aria-hidden="true" />
+          {view === "overview" ? <div className={styles.cityIntro}><p className={styles.eyebrow}>● &nbsp; NEW YORK, AFTER HOURS</p><h1>A city full<br />of <em>inside jokes.</em></h1><p>Pick a neighborhood. See where the night goes.</p></div> : <><div className={styles.cityIntro}><p className={styles.eyebrow}>● &nbsp; UPTOWN / {region.name.toUpperCase()}</p><h1>{region.name},<br /><em>after hours.</em></h1><p>Library lore. Dorm drama. Your kind of people.</p></div><button type="button" className={styles.streetBack} onClick={showMap}>⌖ &nbsp; Back to the city</button></>}
           {view === "overview" && <div className={styles.mapMarkers} aria-label="Neighborhoods">
-            {regions.map((item) => <button key={item.id} ref={(element) => { markerRefs.current[item.id] = element; }} type="button" className={`${styles.marker} ${styles.photoMarker} ${item.id === "ktown" ? styles.ktownMarker : ""} ${reaction?.region === item.id ? styles.markerReacting : ""}`} style={{ "--marker-x": `${item.x}%`, "--marker-y": `${item.y}%`, "--sprite-position": item.spritePosition } as CSSProperties} onClick={() => selectRegion(item.id)} aria-label={`Explore ${item.id === "campus" ? "Columbia" : item.name}`} aria-pressed={collectionRegion === item.id}>
+            <svg className={styles.mapRoute} viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              <path className={styles.desktopRoute} d="M 55.6 22.7 C 55.6 32.5, 56.3 43.8, 57.8 56.1 C 59.2 61.2, 64.7 65.1, 70 70.1" />
+              <path className={styles.mobileRoute} d="M 55.6 53.5 C 55.8 62.5, 56.6 68.9, 58 73.3 C 60.8 77, 65.5 80, 70 81.5" />
+            </svg>
+            {regions.map((item) => <button key={item.id} ref={(element) => { markerRefs.current[item.id] = element; }} type="button" className={`${styles.marker} ${styles.photoMarker} ${item.id === "campus" ? styles.campusMarker : ""} ${item.id === "ktown" ? styles.ktownMarker : ""} ${item.id === "east-village" ? styles.eastVillageMarker : ""} ${reaction?.region === item.id ? styles.markerReacting : ""}`} style={{ "--marker-x": `${item.x}%`, "--marker-y": `${item.y}%`, "--sprite-position": item.spritePosition } as CSSProperties} onClick={() => selectRegion(item.id)} aria-label={`Explore ${item.id === "campus" ? "Columbia" : item.name}`} aria-pressed={collectionRegion === item.id}>
               <span className={styles.markerPhoto} aria-hidden="true">
-                <Image src={item.id === "campus" ? "/room/landmarks/columbia.webp" : item.id === "ktown" ? "/room/landmarks/ktown.webp" : "/room/landmarks/east-village.webp"} alt="" fill sizes="(max-width: 430px) 104px, (max-width: 900px) 122px, 154px" className={item.id === "ktown" ? styles.ktownPhoto : undefined} />
-                <span className={styles.photoMarkerLabel}>{item.id === "campus" ? "Columbia" : item.name}</span>
+                <span className={styles.markerImage}>
+                  <Image src={item.id === "campus" ? "/room/landmarks/columbia.webp" : item.id === "ktown" ? "/room/landmarks/ktown.webp" : "/room/landmarks/east-village.webp"} alt="" fill sizes="(max-width: 430px) 104px, (max-width: 900px) 122px, 154px" className={item.id === "ktown" ? styles.ktownPhoto : undefined} />
+                </span>
+                <span className={styles.photoMarkerLabel}>{item.id === "campus" ? "Campus" : item.name}<i aria-hidden="true">↗</i></span>
               </span>
               <span className={styles.markerDot} aria-hidden="true" />
+              <span className={styles.markerNote}>{item.id === "campus" ? "THE UPTOWN CROWD" : item.id === "ktown" ? "ONE MORE SONG" : "TAKE THE DETOUR"}</span>
               {reaction?.region === item.id && <span key={`spark-${reaction.key}`} onAnimationEnd={() => clearReaction(reaction.key)} className={styles.reactionSpark} aria-hidden="true">{reaction.kind === "laugh" ? "✦ haha" : "✧"}</span>}
             </button>)}
           </div>}
           {view === "street" && <>
-            <div className={styles.streetTitle}><span aria-hidden="true">⌖</span> {region.name}</div>
             <div className={styles.streetHosts} aria-label={`${region.name} meme themes`}>
               {region.themes.map((theme, index) => <button key={theme} type="button" className={`${styles.hostButton} ${themeId === theme ? styles.hostSelected : ""} ${reaction?.region === region.id && reaction.theme === theme ? styles.hostReacting : ""}`} style={{ "--hotspot-x": `${region.hotspotPositions[index].x}%`, "--hotspot-y": `${region.hotspotPositions[index].y}%`, "--sprite-position": index === 0 ? region.spritePosition : "50% 0%" } as CSSProperties} onClick={() => selectTheme(theme)} aria-label={`Browse ${themes[theme].label} memes in ${region.name}`} aria-pressed={themeId === theme}>
-                <span className={styles.hostAnimal} aria-hidden="true" />
+                <span className={styles.hostAnimal} aria-hidden="true" style={{ backgroundImage: `url("${theme === "study" ? "/room/animals/library-cat.webp" : theme === "dorm" ? "/room/animals/dorm-cat.webp" : theme === "late-bites" || theme === "cheap-eats" ? "/room/animals/dining-cat.webp" : theme === "live-music" ? "/room/animals/campus-raccoon.webp" : "/room/animals/subway-dog.webp"}")`, backgroundPosition: "center", backgroundSize: "cover" }} />
                 {reaction?.region === region.id && reaction.theme === theme && <span key={`spark-${reaction.key}`} onAnimationEnd={() => clearReaction(reaction.key)} className={styles.reactionSpark} aria-hidden="true">{reaction.kind === "laugh" ? "✦ haha" : "✧"}</span>}
                 <span>{themes[theme].icon} {themes[theme].label}</span>
               </button>)}
@@ -342,7 +344,9 @@ export function CampusDiorama({ initialFeed = false, initialLocation = "all", ca
       </section>
 
       <aside className={styles.viewer} id="meme-viewer" tabIndex={-1} aria-label="Meme browser">
-        <div className={styles.viewerHeader}><h1>{collectionTitle}</h1><span className={styles.sampleCount} aria-label={visibleSamples.length ? `Meme ${selectedIndex + 1} of ${visibleSamples.length}` : "No memes"}>{visibleSamples.length ? `${selectedIndex + 1} / ${visibleSamples.length}` : "0 memes"}</span></div>
+        <div className={styles.viewerKicker}><span>● &nbsp; FRESH FROM {regionId === "campus" ? "CAMPUS" : regionId === "ktown" ? "KTOWN" : "THE CITY"}</span><span>{String(selectedIndex + 1).padStart(2, "0")} / {String(visibleSamples.length).padStart(2, "0")}</span></div>
+        <div className={styles.viewerHeader}><h1>{collectionRegion ? `${selectedRegion?.name} after hours.` : "The current mood."}</h1><span className={styles.viewerSpark} aria-hidden="true">✳</span></div>
+        {collectionRegion && <div className={styles.viewerThemes}><button type="button" aria-pressed={themeId === null} onClick={() => { setThemeId(null); setSelectedId(samples.find((item) => item.region === regionId)!.id); }}>All moments</button>{region.themes.map((theme) => <button key={theme} type="button" aria-pressed={themeId === theme} onClick={() => selectTheme(theme)}>{themes[theme].label}</button>)}</div>}
         {selected ? <>
         <p className={styles.srOnly} aria-live="polite" aria-atomic="true">{collectionTitle}, {visibleSamples.length} memes. Featured meme: {selected.top}. Meme {selectedIndex + 1} of {visibleSamples.length}.</p>
         <article className={styles.featured} aria-label={`Featured ${selectedRegion!.name} ${selected.caption ? "published meme" : "sample"}`}>

@@ -4,6 +4,17 @@
   color: #fff2dc;
 }
 
+.profilePage > .fullBleedBanner { margin-inline: -16px; }
+@media (min-width: 640px) {
+  .profilePage > .fullBleedBanner { margin-inline: -28px; }
+}
+@media (min-width: 1024px) {
+  .profilePage > .fullBleedBanner { margin-inline: -40px; }
+}
+@media (max-width: 380px) {
+  .profilePage > .fullBleedBanner { margin-inline: -12px; }
+}
+
 .profileWrap {
   width: min(1100px, calc(100% - 60px));
   margin: 54px auto 0;

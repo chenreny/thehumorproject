@@ -46,6 +46,10 @@ export async function generateCaption(_previous: GenerationState, formData: Form
   const modelTopic = topicLabel(input.topic);
   const imageSource = formData.get("image_source");
   if (imageSource !== "provided" && imageSource !== "generated") return { message: "Choose a template, upload a photo, or generate an image." };
+  const imagePrompt = formData.get("image_prompt");
+  if (imageSource === "generated" && (typeof imagePrompt !== "string" || imagePrompt.trim().length < 10 || imagePrompt.length > 500)) {
+    return { message: "Describe the picture in 10–500 characters." };
+  }
   const templateId = formData.get("template_id");
   const template = getTemplate(templateId);
   if (templateId && !template) return { message: "Choose a template from the gallery, upload a photo, or generate an image." };
@@ -99,7 +103,7 @@ export async function generateCaption(_previous: GenerationState, formData: Form
   let meme: GenerationState["meme"];
   try {
     if (imageSource === "generated") {
-      const generatedBytes = await generateMemeImage(input.prompt, modelTopic, apiKey);
+      const generatedBytes = await generateMemeImage(imagePrompt as string, modelTopic, apiKey);
       imageBytes = await normalizeMemeImage(new File([new Uint8Array(generatedBytes)], "ai-generated.jpg", { type: "image/jpeg" }));
     }
     if (!imageBytes) throw new Error("Image unavailable");

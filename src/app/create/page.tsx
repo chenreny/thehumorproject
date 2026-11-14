@@ -3,7 +3,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { dailyScene, TOPICS } from "@/lib/generation";
-import { SiteNav } from "@/components/site-nav";
+import { CityBanner } from "@/components/city-banner";
 import { GenerationForm } from "./generation-form";
 import { roomScene } from "@/lib/room-scenes";
 import { getTemplate } from "@/lib/templates";
@@ -41,13 +41,17 @@ export default async function CreatePage({ searchParams }: { searchParams: Promi
     .select("id, prompt, status, created_at, captions(id)").order("created_at", { ascending: false }).limit(10).returns<GenerationHistory[]>()
     : { data: null, error: null };
   const configured = Boolean(process.env.OPENAI_API_KEY && process.env.SUPABASE_SERVICE_ROLE_KEY);
-  return <main className={`${styles.shell} page-shell create-page`}>
-    <SiteNav signedIn={Boolean(user)} active="create" />
+  return <main className={`${styles.shell} create-page`}>
+    <CityBanner active="studio" />
+    <div className={`${styles.contentShell} page-shell`}>
     <section className={styles.experience} aria-label="Meme creation studio">
       <header className={styles.hero}>
-        <p className={styles.heroEyebrow}>MEME STUDIO</p>
-        <h1>Make a meme</h1>
-        <p>Pick a picture. Add your take.</p>
+        <div>
+          <p className={styles.heroEyebrow}>THE CITY GIVES YOU THE MATERIAL</p>
+          <h1>You bring the <span>punchline.</span></h1>
+          <p>Pick a picture. Add your very specific situation. Make it yours.</p>
+        </div>
+        <Link href="/" className={styles.backLink}>⌖ &nbsp; Back to the city</Link>
       </header>
       {!configured && <p role="status" className={styles.status}>The generator is being connected. You can browse templates in the meantime.</p>}
       <div className={styles.formFrame}><GenerationForm key={`${initialTopic}:${initialPrompt}:${templateParam ?? ""}:${daily === "1"}`} dailyPrompt={dailyScene()} useDaily={daily === "1" && !initialPrompt} initialPrompt={initialPrompt} initialTopic={initialTopic} initialTemplateId={templateParam} available={configured} signedIn={Boolean(user)} /></div>
@@ -56,9 +60,10 @@ export default async function CreatePage({ searchParams }: { searchParams: Promi
     {user && <details aria-labelledby="history-title" className={styles.history}>
       <summary className={styles.historyHeader}>
         <span className={styles.historyIntro}>
-          <span id="history-title" role="heading" aria-level={2}>Your recent attempts</span>
+          <span aria-hidden="true" className={styles.draftMark}>♧</span>
+          <span id="history-title" role="heading" aria-level={2}>Your drafts</span>
         </span>
-        <span className={styles.historyOpenLabel}><span className={styles.historyOpenText}>Open gallery</span><span className={styles.historyCloseText}>Close gallery</span></span>
+        <span className={styles.historyOpenLabel}><span className={styles.historyOpenText}>Open gallery　＋</span><span className={styles.historyCloseText}>Close gallery　−</span></span>
       </summary>
       <div className={styles.historyContent}>
         {error ? <p role="alert" className="text-[#ffad99]">Your history couldn’t load. Please refresh.</p> : history?.length ? <ul className={styles.historyGrid}>{history.map((item, index) => <li key={item.id} className={styles.historyCard}>
@@ -74,6 +79,7 @@ export default async function CreatePage({ searchParams }: { searchParams: Promi
         </li>)}</ul> : <div className={styles.historyEmpty}>Your first prompt belongs here. Your attempts will appear in this private gallery.</div>}
       </div>
     </details>}
+    </div>
     </div>
   </main>;
 }

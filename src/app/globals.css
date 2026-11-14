@@ -35,7 +35,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; zoom: 1; }
+html { scroll-behavior: smooth; scrollbar-gutter: stable; zoom: 1; }
 body { background: var(--background); color: var(--foreground); font-family: var(--font-geist), Arial, Helvetica, sans-serif; }
 button, a, input, textarea, select { touch-action: manipulation; }
 button:not(:disabled), select { cursor: pointer; }
@@ -348,30 +348,42 @@ button:disabled { cursor: default; }
 .campus-page .nav-center a, .campus-page .nav-account a, .campus-page .nav-account button { min-height: 48px; color: #10182b; font-family: "Patrick Hand", var(--font-geist), sans-serif; font-size: 25px; font-weight: 400; }
 .campus-page .nav-center a[aria-current="page"]::after, .campus-page .nav-account a[aria-current="page"]::after { display: none; }
 .campus-page > .campus-page-width > .room-alert { position: relative; z-index: 5; margin: 0; border-radius: 0; }
-.create-page .site-nav { display: grid; width: 100vw; height: 70px; min-height: 70px; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; margin: 0 0 0 calc(50% - 50vw); border: 0; border-bottom: 1px solid rgb(231 220 199 / 12%); background: #101a2f; padding: 9px clamp(16px, 3vw, 48px); color: #f5efe3; }
+.create-page .site-nav { display: grid; width: 100vw; height: 84px; min-height: 84px; grid-template-columns: minmax(245px, 1fr) auto minmax(300px, 1fr); align-items: center; gap: 16px; margin: 0 0 0 calc(50% - 50vw); border: 0; border-bottom: 1px solid rgb(231 220 199 / 12%); background: #0d192b; padding: 10px clamp(22px, 3.5vw, 58px); color: #f7f0e3; }
 .create-page .nav-left { justify-self: start; }
-.create-page .radio-logo { display: grid; width: 80px; height: 52px; place-items: center; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
-.create-page .radio-logo img { width: 100%; height: 100%; object-fit: contain; filter: brightness(1.4) saturate(1.12) drop-shadow(0 0 7px #ffd79c60) drop-shadow(0 2px 4px #07101d); }
-.create-page .nav-center { justify-self: center; gap: clamp(12px, 2.8vw, 42px); }
-.create-page .nav-account { justify-self: end; gap: 15px; }
+.create-page .radio-logo { display: grid; width: 220px; height: 54px; place-items: center; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.create-page .radio-logo img { width: 68px; height: 52px; object-fit: contain; filter: brightness(1.4) saturate(1.12) drop-shadow(0 0 7px #ffd79c60) drop-shadow(0 2px 4px #07101d); }
+.create-page .nav-center { justify-self: center; gap: clamp(20px, 2.7vw, 44px); }
+.create-page .nav-account { justify-self: end; gap: 18px; }
 .create-page .nav-account form { margin: 0; }
-.create-page .nav-center a, .create-page .nav-account a, .create-page .nav-account button { min-height: 44px; color: #f5efe3; font: 650 14px/1 var(--font-geist), Arial, Helvetica, sans-serif; white-space: nowrap; }
+.create-page .nav-center a, .create-page .nav-account a, .create-page .nav-account button { min-height: 44px; color: #c0cadd; font: 650 13px/1 var(--font-geist), Arial, Helvetica, sans-serif; white-space: nowrap; }
 .create-page .nav-account button { color: #b4bfd1; }
-.create-page .nav-center a[aria-current="page"]::after, .create-page .nav-account a[aria-current="page"]::after { bottom: 5px; background: #ff705f; }
+.create-page .nav-center a[aria-current="page"]::after, .create-page .nav-account a[aria-current="page"]::after { bottom: 2px; height: 3px; background: #ff7564; }
 .create-page .nav-center a:hover, .create-page .nav-account a:hover { color: #ffd4a2; }
 .create-page .nav-account button:hover { color: #f5efe3; }
+.create-page .nav-account .home-create-pill { display: inline-flex; min-height: 44px; align-items: center; gap: 9px; border-radius: 999px; background: #ff7564; padding: 0 20px; color: #14213a; font-weight: 800; text-decoration: none; }
+.create-page .nav-account .home-create-pill:hover { background: #ff8876; color: #14213a; }
+.create-page .nav-account .home-create-pill span { font-size: 18px; }
+.create-page .nav-account .home-profile-pill { display: inline-flex; min-height: 38px; align-items: center; border: 1px solid #4a5b73; border-radius: 999px; background: #1a2942; padding: 0 13px; color: #fff0dc; font-size: 12px; font-weight: 700; text-decoration: none; }
+.create-page .nav-account .home-profile-pill:hover { background: #26344d; color: #fff0dc; }
 @media (max-width: 640px) {
-  .create-page .site-nav { height: 62px; min-height: 62px; gap: 8px; padding: 8px 12px; }
-  .create-page .radio-logo { width: 66px; height: 46px; }
-  .create-page .nav-center { gap: 10px; }
-  .create-page .nav-account { gap: 10px; }
-  .create-page .nav-center a, .create-page .nav-account a, .create-page .nav-account button { font-size: 12px; }
+  .create-page .site-nav { height: 66px; min-height: 66px; grid-template-columns: 60px minmax(0, 1fr) auto; gap: 6px; padding: 6px 10px; }
+  .create-page .radio-logo { width: 60px; height: 46px; }
+  .create-page .radio-logo img { width: 56px; height: 42px; }
+  .create-page .nav-center { gap: 6px; }
+  .create-page .nav-account { gap: 5px; }
+  .create-page .nav-center a, .create-page .nav-account a, .create-page .nav-account button { font-size: 10px; }
+  .create-page .nav-account .home-create-pill { min-height: 36px; gap: 4px; padding: 0 8px; font-size: 10px; }
+  .create-page .nav-account .home-profile-pill { min-height: 32px; padding: 0 9px; font-size: 10px; }
 }
 @media (max-width: 390px) {
-  .create-page .site-nav { grid-template-columns: 66px 1fr auto; gap: 6px; }
-  .create-page .nav-center { gap: 7px; }
-  .create-page .nav-account { gap: 7px; }
-  .create-page .nav-center a, .create-page .nav-account a, .create-page .nav-account button { font-size: 11px; }
+  .create-page .site-nav { grid-template-columns: 58px minmax(0, 1fr) auto; }
+  .create-page .radio-logo { width: 58px; }
+  .create-page .nav-center { gap: 5px; }
+  .create-page .nav-account { gap: 4px; }
+  .create-page .nav-center a, .create-page .nav-account a, .create-page .nav-account button { font-size: 9px; }
+  .create-page .nav-account .home-create-pill { min-height: 36px; gap: 4px; padding: 0 6px; font-size: 9px; }
+  .create-page .nav-account .home-create-pill span { font-size: 14px; }
+  .create-page .nav-account .home-profile-pill { min-height: 28px; padding: 0 7px; font-size: 9px; }
 }
 .room-set { position: relative; height: clamp(760px, 56.75vw, 900px); min-height: 0; margin: 0; }
 .room-heading { position: absolute; top: 23px; right: 0; left: 0; margin: 0; text-align: center; }

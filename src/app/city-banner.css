@@ -1,0 +1,169 @@
+.city-banner {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  min-height: 84px;
+  align-items: center;
+  padding: 10px clamp(22px, 3.5vw, 58px);
+  border-bottom: 1px solid rgb(231 220 199 / 12%);
+  background: #0d192b;
+  color: #f7f0e3;
+}
+
+.city-banner-nav {
+  display: grid;
+  width: 100%;
+  grid-template-columns: minmax(245px, 1fr) auto minmax(300px, 1fr);
+  align-items: center;
+  gap: 16px;
+}
+
+.city-banner-brand {
+  display: flex;
+  width: 220px;
+  height: 54px;
+  align-items: center;
+  text-decoration: none;
+}
+
+.city-banner-brand-image {
+  display: block;
+  width: 68px;
+  height: 52px;
+  flex: none;
+  object-fit: contain;
+  filter: brightness(1.4) saturate(1.12) drop-shadow(0 0 7px #ffd79c60) drop-shadow(0 2px 4px #07101d);
+}
+
+.city-banner-center,
+.city-banner-account { display: flex; align-items: center; }
+.city-banner-center { justify-self: center; gap: clamp(20px, 2.7vw, 44px); }
+.city-banner-account { justify-self: end; gap: 18px; }
+
+.city-banner-center a,
+.city-banner-account a {
+  display: inline-flex;
+  position: relative;
+  min-height: 44px;
+  align-items: center;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #c0cadd;
+  font: 650 13px/1 var(--font-geist), Arial, Helvetica, sans-serif;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.city-banner-center a:hover,
+.city-banner-account a:hover { color: #ffd4a2; }
+
+/* Keep the centered links in place while the local navigation font loads. */
+.city-banner-center a:nth-child(1) { min-width: 99px; }
+.city-banner-center a:nth-child(2) { min-width: 68px; }
+.city-banner-center a:nth-child(3) { min-width: 42px; }
+
+.city-banner-account .city-banner-create {
+  min-width: 164px;
+  min-height: 44px;
+  gap: 9px;
+  border-radius: 999px;
+  background: #ff7564;
+  padding: 0 20px;
+  color: #14213a;
+  font-weight: 800;
+}
+.city-banner-account .city-banner-create:hover { background: #ff8876; color: #14213a; }
+.city-banner-create span { font-size: 18px; }
+
+.city-banner-account-menu { position: relative; flex: none; }
+.city-banner-account .city-banner-profile {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border: 4px solid #26344d;
+  border-radius: 50%;
+  background: #fff1dc;
+  padding: 0;
+  color: #243450;
+  cursor: pointer;
+}
+.city-banner-account .city-banner-profile:hover,
+.city-banner-account .city-banner-profile[aria-expanded="true"] { background: #fff8eb; }
+.city-banner-profile svg { width: 21px; height: 21px; }
+.city-banner-account .city-banner-profile:focus-visible,
+.city-banner-account-panel :focus-visible { outline: 3px solid #ffb493; outline-offset: 3px; }
+
+.city-banner-account-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 10;
+  width: 218px;
+  border: 1px solid #34455f;
+  border-radius: 14px;
+  background: #14233b;
+  padding: 12px 18px 14px;
+  box-shadow: 0 14px 32px #050d1f80;
+}
+.city-banner-account-panel[hidden] { display: none; }
+.city-banner-account .city-banner-account-preview {
+  display: flex;
+  min-height: 63px;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+}
+.city-banner-account-preview strong { font-weight: 750; }
+.city-banner-account-preview span { color: #d4ddec; font-size: 11px; font-weight: 400; }
+.city-banner-account .city-banner-account-preview:hover strong,
+.city-banner-account .city-banner-account-preview:hover span { color: #ffc0a4; }
+.city-banner-account-panel form { margin: 0; border-top: 1px solid #2a3b54; padding-top: 12px; }
+.city-banner-sign-out {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 12px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #ff907c;
+  font: 650 12px/1 var(--font-geist), Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+.city-banner-sign-out:hover { color: #ffb39f; }
+.city-banner-sign-out svg { width: 17px; height: 17px; }
+
+@media (max-width: 1100px) {
+  .city-banner-nav { grid-template-columns: 210px auto 1fr; }
+  .city-banner-brand { width: 195px; }
+  .city-banner-center { gap: 15px; }
+  .city-banner-account { gap: 8px; }
+  .city-banner-account .city-banner-create { min-width: 150px; padding-inline: 13px; }
+}
+
+@media (max-width: 760px) {
+  .city-banner { min-height: 66px; padding: 6px 10px; }
+  .city-banner-nav { grid-template-columns: 58px minmax(0, 1fr) auto; gap: 6px; }
+  .city-banner-brand { width: 58px; height: 46px; }
+  .city-banner-brand-image { width: 56px; height: 42px; }
+  .city-banner-center { gap: 6px; }
+  .city-banner-center a { font-size: 9px; }
+  .city-banner-center a:nth-child(1) { min-width: 69px; }
+  .city-banner-center a:nth-child(2) { min-width: 47px; }
+  .city-banner-center a:nth-child(3) { min-width: 29px; }
+  .city-banner-account { gap: 5px; }
+  .city-banner-account .city-banner-create { min-width: 101px; min-height: 36px; gap: 4px; padding-inline: 6px; font-size: 9px; }
+  .city-banner-account .city-banner-profile { width: 46px; height: 46px; }
+  .city-banner-account-panel { width: min(218px, calc(100vw - 20px)); }
+}
+
+@media (max-width: 380px) {
+  .city-banner-account .city-banner-create { display: none; }
+}

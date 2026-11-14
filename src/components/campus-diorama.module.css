@@ -112,133 +112,6 @@
   .viewer { position: relative; top: auto; right: auto; width: min(620px, calc(100% - 32px)); max-height: none; align-self: flex-end; overflow: visible; margin: -76px 0 0; transform: none; }
 }
 
-@media (max-width: 900px) {
-  .hud { position: relative; min-height: 62px; padding: 8px 12px; }
-  .hudActions { gap: 3px; }
-  .brand { width: 66px; height: 46px; }
-  .hudActions a, .hudActions button { min-height: 44px; padding: 0 11px; font-size: 11px; }
-  .sharedHud { position: sticky; top: 0; z-index: 5; min-height: 70px; padding: 9px clamp(16px, 3vw, 48px); }
-  .experience { padding: 0 10px 14px; }
-  .world { height: 280px; min-height: 0; flex: none; border: 1px solid #e5d8c450; border-radius: 14px; }
-  .mapAnimal { width: 40px; height: 40px; }
-  .marker { width: 44px; height: 44px; min-height: 44px; border-radius: 50%; }
-  .markerLabel { position: absolute; top: calc(100% + 2px); left: 50%; z-index: 2; max-width: 70px; padding: 2px 5px; font-size: 9px; transform: translateX(-50%); pointer-events: none; }
-  .marker:nth-child(2) .markerLabel { top: 50%; right: calc(100% + 2px); left: auto; transform: translateY(-50%); }
-  .marker:nth-child(3) .markerLabel { top: 50%; right: auto; left: calc(100% + 2px); transform: translateY(-50%); }
-  .markerDot { position: absolute; right: -2px; bottom: -2px; width: 8px; height: 8px; margin: 0; border-width: 2px; box-shadow: 0 0 0 3px #ff816c45, 0 0 12px #ff816c; }
-  .streetTitle { top: 35%; left: 5%; padding: 9px 14px; font-size: clamp(23px, 6vw, 36px); }
-  .hostAnimal { width: 64px; height: 64px; }
-  .hostButton > span:last-child { min-height: 44px; padding: 0 11px; font-size: 11px; }
-  .viewer { width: calc(100% - 14px); align-self: center; margin: -24px 0 0; border-radius: 17px; padding: 13px; }
-  .viewerHeader { margin-bottom: 8px; }
-  .viewer h1 { font-size: clamp(24px, 6vw, 32px); }
-  .memeImage { aspect-ratio: 16 / 10; }
-  .memeTop, .memeBottom { font-size: clamp(21px, 6vw, 32px); }
-  .ratingGroup button { min-height: 46px; font-size: 13px; }
-  .browseControls { margin-top: 3px; }
-  .browseControls button { min-height: 44px; }
-}
-
-@media (max-width: 480px) {
-  .hud { gap: 6px; padding-right: 10px; padding-left: 10px; }
-  .hudActions { min-width: 0; flex: 1 1 210px; flex-wrap: wrap; justify-content: flex-end; row-gap: 4px; }
-  .hudActions form { display: contents; }
-}
-
-@media (max-width: 640px) {
-  .sharedHud { min-height: 62px; padding: 8px 12px; }
-  .sharedHud .brand { width: 66px; height: 46px; }
-  .sharedNav { gap: 8px; }
-  .sharedNavCenter { gap: 10px; }
-  .sharedAccount { gap: 10px; }
-  .sharedNavCenter a, .sharedNavCenter button, .sharedAccount a, .sharedAccount button { font-size: 12px; }
-}
-
-@media (max-width: 390px) {
-  .brand { width: 46px; }
-  .hudActions a, .hudActions button { padding: 0 8px; font-size: 10px; }
-  .sharedNav { grid-template-columns: 66px 1fr auto; gap: 6px; }
-  .sharedNavCenter { gap: 7px; }
-  .sharedAccount { gap: 7px; }
-  .sharedNavCenter a, .sharedNavCenter button, .sharedAccount a, .sharedAccount button { font-size: 11px; }
-  .world { height: 280px; }
-  .streetTitle { top: 5%; font-size: 23px; }
-  .hostAnimal { width: 54px; height: 54px; }
-  .ratingGroup { gap: 6px; }
-  .ratingGroup button { gap: 4px; font-size: 12px; }
-}
-
-@media (max-height: 600px) and (min-width: 901px) {
-  .world { height: calc(100dvh - 70px); min-height: calc(100dvh - 70px); }
-  .viewer { max-height: calc(100dvh - 62px); padding: 14px; }
-  .memeImage { aspect-ratio: 16 / 9; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .shell *, .shell *::before, .shell *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
-}
-
-.shell :where(a, button):focus-visible { outline: 3px solid #f1a178; outline-offset: 3px; }
-.hostButton { --sprite-position: 50% 0%; }
-.hostButton > span:last-child { max-width: 148px; justify-content: center; white-space: nowrap; box-shadow: 0 4px 12px #07101d72; }
-.hostSelected > span:last-child { outline: 3px solid #fff2da; outline-offset: 2px; box-shadow: 0 0 0 6px #ff9b6d46, 0 4px 14px #07101d80; }
-.hostButton:hover > span:last-child { filter: brightness(1.14); transform: translateY(-1px); }
-.hostButton:focus-visible { z-index: 3; }
-.streetTitle { z-index: 1; }
-
-.feedPage { width: min(100%, 1560px); flex: 1; align-self: center; padding: clamp(20px, 4vw, 52px) clamp(14px, 4vw, 56px) 38px; color: var(--paper); }
-.feedIntro { max-width: 700px; margin: 0 auto 22px; text-align: center; }
-.feedIntro h1 { margin: 5px 0 8px; font: 700 clamp(34px, 5vw, 58px)/1 Georgia, serif; letter-spacing: -.04em; }
-.feedIntro p:last-of-type { margin: 0; color: #d7d8df; font-size: 15px; line-height: 1.5; }
-.feedBack { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; margin-top: 16px; border: 1px solid #ccbda9; border-radius: 999px; background: #f5efe3; padding: 0 16px; color: #14213a; font: 650 13px/1 var(--font-geist), Arial, Helvetica, sans-serif; }
-.feedBack:hover { background: #ffdfb2; }
-.eyebrow { margin: 0; color: #ffd08c; font: 800 11px/1.2 Arial, sans-serif; letter-spacing: .16em; }
-.backToCity { border-color: #ccbda9 !important; background: #f5efe3 !important; color: #14213a !important; }
-.backToCity:hover { background: #ffdfb2 !important; }
-.locationFilters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 22px auto 10px; }
-.locationFilters button { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 9px; border: 1px solid #8991a0; border-radius: 999px; background: #1c2940; padding: 0 16px; color: #fff8ed; font: 700 13px/1 Arial, sans-serif; }
-.locationFilters button span { display: inline-grid; min-width: 23px; height: 23px; place-items: center; border-radius: 999px; background: #344158; color: #e6dfd4; font: 700 11px/1 Arial, sans-serif; }
-.locationFilters button:hover { border-color: #ffb39c; background: #29374f; }
-.locationFilters button[aria-pressed="true"] { border-color: #ffae94; background: var(--coral); color: #14213a; }
-.locationFilters button[aria-pressed="true"] span { background: #fff0d8; color: #14213a; }
-.feedError { margin: 10px 0 16px; border: 1px solid #ff9180; border-radius: 12px; background: #442b36; padding: 12px 14px; color: #fff0e7; font: 600 13px/1.45 Arial, sans-serif; text-align: center; }
-.memeGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
-.feedCard { min-width: 0; overflow: hidden; border: 1px solid #e5d8c4; border-radius: 16px; background: #f7f1e7; color: var(--ink); box-shadow: 0 10px 28px #03081745; }
-.feedImage { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #37455c; }
-.feedImage img { object-fit: cover; }
-.feedRatings { display: grid; grid-template-columns: 1fr auto 1fr; gap: 7px; padding: 0 10px 11px; }
-.feedRatings > span { grid-column: 1 / -1; align-self: center; color: #526078; font-size: 11px; line-height: 1.35; text-align: center; }
-.feedRatings > .voteCount, .ratingGroup > .voteCount { grid-column: 2; align-self: center; min-width: 2ch; color: #667184; font-size: 12px; font-weight: 400; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
-.feedRatings button { display: flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; gap: 6px; border: 1px solid #ded6ca; border-radius: 999px; background: #fffaf3; color: var(--ink); font: 700 12px/1 Arial, sans-serif; }
-.feedRatings button:hover { border-color: #ef8b7b; }
-.feedRatings button[aria-pressed="true"] { border-color: var(--coral); background: #ff7564; color: white; }
-.feedRatings button:disabled { cursor: default; opacity: .65; }
-.emptyFeed { padding: 34px 16px; border: 1px dashed #7a8494; border-radius: 14px; color: #e0e2e7; text-align: center; }
-
-@media (max-width: 900px) {
-  .artArea { top: 0; }
-  .streetTitle { top: 20%; left: 5%; }
-  .hostAnimal { background-size: 300% 200%; }
-  .feedPage { padding-top: 23px; }
-  .feedIntro { margin-bottom: 16px; }
-  .memeGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-}
-@media (max-width: 520px) {
-  .feedPage { padding-right: 12px; padding-left: 12px; }
-  .feedIntro p:last-of-type { font-size: 13px; }
-  .locationFilters { justify-content: flex-start; gap: 6px; }
-  .locationFilters button { min-height: 44px; gap: 6px; padding: 0 11px; font-size: 11px; }
-  .memeGrid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  .feedImage { aspect-ratio: 16 / 11; }
-}
-@media (max-width: 350px) {
-  .streetTitle { top: 14%; max-width: 56%; padding: 8px 10px; font-size: 19px; }
-  .hostButton > span:last-child { max-width: 112px; padding: 0 8px; font-size: 10px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .hostButton > span:last-child { transition: none; }
-}
-
 /* Cursor rules follow component styles so controls inherit the custom pointer. */
 @media (pointer: fine) {
   .shell { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath d='m12 1.6 2.7 7.1 7.5.4-5.8 4.9 1.9 7.3-6.3-4-6.3 4 1.9-7.3-5.8-4.9 7.5-.4z' fill='%23ffe8b4' stroke='%23ef705e' stroke-width='1.5' stroke-linejoin='round'/%3E%3C/svg%3E") 12 12, auto; }
@@ -338,7 +211,6 @@
 .photoMarker:nth-child(3) .markerPhoto img { transform: scale(1.5); transform-origin: 50% 51%; }
 .ktownPhoto { transform: scale(1.08); transform-origin: center; }
 .photoMarkerLabel { position: absolute; z-index: 2; right: 9px; bottom: 10px; left: 9px; color: white; font: 800 16px/1.1 Arial, sans-serif; text-align: center; text-shadow: 0 1px 5px #020711; white-space: nowrap; }
-.mapMarkers .photoMarker:nth-child(3) { left: 71%; }
 .photoMarker::after { width: 3px; height: 14px; background: #ffe3bb; content: ""; }
 .photoMarker .markerDot { width: 13px; height: 13px; margin-top: 0; border-width: 3px; box-shadow: 0 0 0 6px #ff806d45, 0 0 22px #ff806d; }
 .markerReacting .markerPhoto { animation: host-bounce 520ms ease-in-out; }
@@ -355,7 +227,346 @@
   .photoMarkerLabel { right: 5px; bottom: 6px; left: 5px; font-size: 11px; }
 }
 @media (max-width: 1250px) {
-  /* Give the three stops room on the compact map so Ktown stays visible. */
-  .mapMarkers .marker:nth-child(2) { left: 38%; top: 64%; }
-  .mapMarkers .marker:nth-child(3) { left: 82%; top: 68%; }
+}
+
+@media (max-width: 900px) {
+  .hud { position: relative; min-height: 62px; padding: 8px 12px; }
+  .hudActions { gap: 3px; }
+  .brand { width: 66px; height: 46px; }
+  .hudActions a, .hudActions button { min-height: 44px; padding: 0 11px; font-size: 11px; }
+  .sharedHud { position: sticky; top: 0; z-index: 5; min-height: 70px; padding: 9px clamp(16px, 3vw, 48px); }
+  .experience { padding: 0 10px 14px; }
+  .world { height: 280px; min-height: 0; flex: none; border: 1px solid #e5d8c450; border-radius: 14px; }
+  .mapAnimal { width: 40px; height: 40px; }
+  .marker { width: 44px; height: 44px; min-height: 44px; border-radius: 50%; }
+  .markerLabel { position: absolute; top: calc(100% + 2px); left: 50%; z-index: 2; max-width: 70px; padding: 2px 5px; font-size: 9px; transform: translateX(-50%); pointer-events: none; }
+  .marker:nth-child(2) .markerLabel { top: 50%; right: calc(100% + 2px); left: auto; transform: translateY(-50%); }
+  .marker:nth-child(3) .markerLabel { top: 50%; right: auto; left: calc(100% + 2px); transform: translateY(-50%); }
+  .markerDot { position: absolute; right: -2px; bottom: -2px; width: 8px; height: 8px; margin: 0; border-width: 2px; box-shadow: 0 0 0 3px #ff816c45, 0 0 12px #ff816c; }
+  .streetTitle { top: 35%; left: 5%; padding: 9px 14px; font-size: clamp(23px, 6vw, 36px); }
+  .hostAnimal { width: 64px; height: 64px; }
+  .hostButton > span:last-child { min-height: 44px; padding: 0 11px; font-size: 11px; }
+  .viewer { width: calc(100% - 14px); align-self: center; margin: -24px 0 0; border-radius: 17px; padding: 13px; }
+  .viewerHeader { margin-bottom: 8px; }
+  .viewer h1 { font-size: clamp(24px, 6vw, 32px); }
+  .memeImage { aspect-ratio: 16 / 10; }
+  .memeTop, .memeBottom { font-size: clamp(21px, 6vw, 32px); }
+  .ratingGroup button { min-height: 46px; font-size: 13px; }
+  .browseControls { margin-top: 3px; }
+  .browseControls button { min-height: 44px; }
+}
+
+@media (max-width: 480px) {
+  .hud { gap: 6px; padding-right: 10px; padding-left: 10px; }
+  .hudActions { min-width: 0; flex: 1 1 210px; flex-wrap: wrap; justify-content: flex-end; row-gap: 4px; }
+  .hudActions form { display: contents; }
+}
+
+@media (max-width: 640px) {
+  .sharedHud { min-height: 62px; padding: 8px 12px; }
+  .sharedHud .brand { width: 66px; height: 46px; }
+  .sharedNav { gap: 8px; }
+  .sharedNavCenter { gap: 10px; }
+  .sharedAccount { gap: 10px; }
+  .sharedNavCenter a, .sharedNavCenter button, .sharedAccount a, .sharedAccount button { font-size: 12px; }
+}
+
+@media (max-width: 390px) {
+  .brand { width: 46px; }
+  .hudActions a, .hudActions button { padding: 0 8px; font-size: 10px; }
+  .sharedNav { grid-template-columns: 66px 1fr auto; gap: 6px; }
+  .sharedNavCenter { gap: 7px; }
+  .sharedAccount { gap: 7px; }
+  .sharedNavCenter a, .sharedNavCenter button, .sharedAccount a, .sharedAccount button { font-size: 11px; }
+  .world { height: 280px; }
+  .streetTitle { top: 5%; font-size: 23px; }
+  .hostAnimal { width: 54px; height: 54px; }
+  .ratingGroup { gap: 5px; }
+  .ratingGroup button { gap: 4px; font-size: 12px; }
+}
+
+@media (max-height: 600px) and (min-width: 901px) {
+  .world { height: calc(100dvh - 70px); min-height: calc(100dvh - 70px); }
+  .viewer { max-height: calc(100dvh - 62px); padding: 14px; }
+  .memeImage { aspect-ratio: 16 / 9; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell *, .shell *::before, .shell *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+.shell :where(a, button):focus-visible { outline: 3px solid #f1a178; outline-offset: 3px; }
+.hostButton { --sprite-position: 50% 0%; }
+.hostButton > span:last-child { max-width: 148px; justify-content: center; white-space: nowrap; box-shadow: 0 4px 12px #07101d72; }
+.hostSelected > span:last-child { outline: 3px solid #fff2da; outline-offset: 2px; box-shadow: 0 0 0 6px #ff9b6d46, 0 4px 14px #07101d80; }
+.hostButton:hover > span:last-child { filter: brightness(1.14); transform: translateY(-1px); }
+.hostButton:focus-visible { z-index: 3; }
+.streetTitle { z-index: 1; }
+
+.feedPage { width: min(100%, 1560px); flex: 1; align-self: center; padding: clamp(20px, 4vw, 52px) clamp(14px, 4vw, 56px) 38px; color: var(--paper); }
+.feedIntro { max-width: 700px; margin: 0 auto 22px; text-align: center; }
+.feedIntro h1 { margin: 5px 0 8px; font: 700 clamp(34px, 5vw, 58px)/1 Georgia, serif; letter-spacing: -.04em; }
+.feedIntro p:last-of-type { margin: 0; color: #d7d8df; font-size: 15px; line-height: 1.5; }
+.feedBack { display: inline-flex; min-height: 44px; align-items: center; justify-content: center; margin-top: 16px; border: 1px solid #ccbda9; border-radius: 999px; background: #f5efe3; padding: 0 16px; color: #14213a; font: 650 13px/1 var(--font-geist), Arial, Helvetica, sans-serif; }
+.feedBack:hover { background: #ffdfb2; }
+.streetBack { position: absolute; z-index: 6; top: clamp(14px, 2.5vw, 30px); right: calc(clamp(35px, 4vw, 78px) + 28px); display: inline-flex; min-height: 42px; align-items: center; margin: 0; border: 1px solid #516078; border-radius: 999px; background: #14213a; padding: 0 16px; color: #fff1df; font: 650 13px/1 var(--font-geist), Arial, Helvetica, sans-serif; pointer-events: auto; }
+.streetBack:hover { background: #1d2b45; }
+@media (max-width: 1250px) { .streetBack { right: 28px; } }
+.eyebrow { margin: 0; color: #ffd08c; font: 800 11px/1.2 Arial, sans-serif; letter-spacing: .16em; }
+.locationFilters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 22px auto 10px; }
+.locationFilters button { display: inline-flex; min-height: 46px; align-items: center; justify-content: center; gap: 9px; border: 1px solid #8991a0; border-radius: 999px; background: #1c2940; padding: 0 16px; color: #fff8ed; font: 700 13px/1 Arial, sans-serif; }
+.locationFilters button span { display: inline-grid; min-width: 23px; height: 23px; place-items: center; border-radius: 999px; background: #344158; color: #e6dfd4; font: 700 11px/1 Arial, sans-serif; }
+.locationFilters button:hover { border-color: #ffb39c; background: #29374f; }
+.locationFilters button[aria-pressed="true"] { border-color: #ffae94; background: var(--coral); color: #14213a; }
+.locationFilters button[aria-pressed="true"] span { background: #fff0d8; color: #14213a; }
+.feedError { margin: 10px 0 16px; border: 1px solid #ff9180; border-radius: 12px; background: #442b36; padding: 12px 14px; color: #fff0e7; font: 600 13px/1.45 Arial, sans-serif; text-align: center; }
+.memeGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.feedCard { min-width: 0; overflow: hidden; border: 1px solid #e5d8c4; border-radius: 16px; background: #f7f1e7; color: var(--ink); box-shadow: 0 10px 28px #03081745; }
+.feedImage { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #37455c; }
+.feedImage img { object-fit: cover; }
+.feedRatings { display: grid; grid-template-columns: 1fr auto 1fr; gap: 7px; padding: 0 10px 11px; }
+.feedRatings > span { grid-column: 1 / -1; align-self: center; color: #526078; font-size: 11px; line-height: 1.35; text-align: center; }
+.feedRatings > .voteCount, .ratingGroup > .voteCount { grid-column: 2; align-self: center; min-width: 2ch; color: #667184; font-size: 12px; font-weight: 400; line-height: 1; text-align: center; font-variant-numeric: tabular-nums; }
+.feedRatings button { display: flex; min-width: 0; min-height: 44px; align-items: center; justify-content: center; gap: 6px; border: 1px solid #ded6ca; border-radius: 999px; background: #fffaf3; color: var(--ink); font: 700 12px/1 Arial, sans-serif; }
+.feedRatings button:hover { border-color: #ef8b7b; }
+.feedRatings button[aria-pressed="true"] { border-color: var(--coral); background: #ff7564; color: white; }
+.feedRatings button:disabled { cursor: default; opacity: .65; }
+.emptyFeed { padding: 34px 16px; border: 1px dashed #7a8494; border-radius: 14px; color: #e0e2e7; text-align: center; }
+
+@media (max-width: 900px) {
+  .artArea { top: 0; }
+  .streetTitle { top: 20%; left: 5%; }
+  .hostAnimal { background-size: 300% 200%; }
+  .feedPage { padding-top: 23px; }
+  .feedIntro { margin-bottom: 16px; }
+  .memeGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+}
+@media (max-width: 520px) {
+  .feedPage { padding-right: 12px; padding-left: 12px; }
+  .feedIntro p:last-of-type { font-size: 13px; }
+  .locationFilters { justify-content: flex-start; gap: 6px; }
+  .locationFilters button { min-height: 44px; gap: 6px; padding: 0 11px; font-size: 11px; }
+  .memeGrid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .feedImage { aspect-ratio: 16 / 11; }
+}
+@media (max-width: 350px) {
+  .streetTitle { top: 14%; max-width: 56%; padding: 8px 10px; font-size: 19px; }
+  .hostButton > span:last-child { max-width: 112px; padding: 0 8px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hostButton > span:last-child { transition: none; }
+}
+
+/* Night City direction: editorial postcards, compact city navigation, and a paper meme card. */
+.shell { --night: #0d192b; --paper: #f7f0e3; background: var(--night); }
+.hud, .sharedHud { min-height: 84px; background: #0d192b; }
+.sharedHud { padding: 10px clamp(22px, 3.5vw, 58px); color: #f7f0e3; }
+.sharedNav { grid-template-columns: minmax(245px, 1fr) auto minmax(300px, 1fr); }
+.brand { display: flex; width: 220px; height: 54px; align-items: center; gap: 12px; }
+.sharedHud .brand { width: 220px; height: 54px; }
+.brandImage { width: 68px; height: 52px; flex: none; }
+.brandWords { color: #fff5e7; font: 800 13px/1.12 var(--font-geist), Arial, sans-serif; letter-spacing: .09em; }
+.brandWords b { margin-left: 9px; color: #ff9b73; font-size: 17px; }
+.sharedNavCenter { gap: clamp(20px, 2.7vw, 44px); }
+.sharedNavCenter a, .sharedNavCenter button, .sharedAccount a, .sharedAccount button { color: #c0cadd; font-size: 13px; }
+.sharedNavCenter a[aria-current="page"]::after, .sharedNavCenter button[aria-current="page"]::after { bottom: 2px; height: 3px; background: #ff7564; }
+.sharedHud .sharedNavCenter a[aria-current="page"]::after { display: none; }
+.sharedAccount { gap: 18px; }
+.sharedAccount .createPill { min-height: 44px; gap: 9px; border-radius: 999px; background: #ff7564; padding: 0 20px; color: #14213a; font-weight: 800; }
+.createPill span { font-size: 18px; }
+.sharedAccount .avatarLink { display: grid; width: 38px; min-height: 38px; place-items: center; border: 1px solid #4a5b73; border-radius: 50%; background: #1a2942; color: #fff0dc; }
+.sharedAccount .profileLink { display: inline-flex; width: auto; align-items: center; justify-content: center; border-radius: 999px; padding: 0 13px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+.experience { --scene-shift: clamp(220px, 16vw, 275px); }
+.world { background-color: #0d192b; }
+.mapScene { filter: brightness(.76) saturate(.82); }
+.sceneShade { background: linear-gradient(90deg, #0d192b0a 0%, #0d192b12 49%, #0d192b88 66%, #0d192b 81%), linear-gradient(180deg, #09132655, transparent 32%, #09132616 71%, #09132678); }
+.cityIntro { position: absolute; z-index: 5; top: 6%; left: clamp(28px, 4vw, 72px); width: min(430px, 36vw); pointer-events: none; }
+.cityIntro .eyebrow { margin: 0 0 16px; color: #ffbc95; font: 800 9px/1.2 var(--font-geist), Arial, sans-serif; letter-spacing: .2em; }
+.cityIntro h1 { margin: 0; color: #fff6e8; font: 400 clamp(38px, 4vw, 59px)/.99 "Lilita One", Impact, sans-serif; letter-spacing: .005em; text-shadow: 0 2px 17px #07101dcc; }
+.cityIntro h1 em { color: #ffc28f; font-style: normal; }
+.cityIntro > p:not(.eyebrow) { margin: 14px 0 0; color: #f6eee1; font-size: 12px; text-shadow: 0 2px 8px #091326; }
+.photoMarker { width: 116px; min-height: 0; gap: 0; overflow: visible; filter: drop-shadow(0 9px 10px #050b17a8); }
+.photoMarker:nth-child(1) { rotate: -4deg; }
+.photoMarker:nth-child(2) { rotate: 3deg; }
+.photoMarker:nth-child(3) { rotate: -2deg; }
+.photoMarker:hover, .photoMarker:focus-visible { z-index: 6; scale: 1.06; filter: drop-shadow(0 11px 15px #050b17b5); }
+.markerPhoto { width: 112px; height: 94px; overflow: hidden; border: 5px solid #fff8ea; border-bottom-width: 31px; border-radius: 5px; background: #fff8ea; box-shadow: 0 1px 0 #deceb4; }
+.markerPhoto img { inset: 0 0 27px !important; width: 100%; height: calc(100% - 27px) !important; object-fit: cover; }
+.markerPhoto::after { display: none; }
+.photoMarkerLabel { right: 4px; bottom: 3px; left: 5px; color: #18243a; font: 16px/1 "Patrick Hand", cursive; text-align: left; text-shadow: none; }
+.photoMarkerLabel i { float: right; font: 12px var(--font-geist), sans-serif; }
+.photoMarker .markerDot { width: 8px; height: 8px; margin-top: 5px; border: 2px solid #fff0d8; box-shadow: 0 0 0 4px #ff806d4a, 0 0 14px #ff806d; }
+.photoMarker::after { width: 2px; height: 8px; background: #fff0d8; }
+.markerNote { margin-top: 3px; color: #fff0d9; font: 700 7px/1.2 var(--font-geist), sans-serif; letter-spacing: .13em; text-shadow: 0 2px 6px #07101d; }
+.viewer { right: clamp(35px, 4vw, 78px); width: clamp(380px, 25vw, 420px); max-height: calc(100dvh - 120px); border: 7px solid #17243a; border-radius: 24px; background: linear-gradient(145deg, #fff8ea, #f2e6d1); padding: 20px 21px 0; box-shadow: 0 18px 50px #02081788; }
+.viewerKicker { display: flex; justify-content: space-between; margin: 1px 0 13px; color: #8c8475; font: 700 8px/1.2 var(--font-geist), sans-serif; letter-spacing: .14em; }
+.viewerKicker span:first-child::first-letter { color: #f27963; }
+.viewerHeader { margin-bottom: 13px; }
+.viewer h1 { color: #14213a; font: 400 clamp(24px, 2.1vw, 31px)/1.03 "Lilita One", Impact, sans-serif; letter-spacing: .005em; }
+.viewerSpark { color: #cf8867; font-size: 25px; }
+.viewerThemes { display: flex; flex-wrap: wrap; gap: 6px; margin: -3px 0 11px; }
+.viewerThemes button { min-height: 29px; border: 1px solid #d7cbbb; border-radius: 999px; background: transparent; padding: 0 11px; color: #7d776c; font: 10px var(--font-geist), sans-serif; }
+.viewerThemes button[aria-pressed="true"] { border-color: #14213a; background: #14213a; color: #fff8ea; }
+.featured { border: 0; border-radius: 9px; background: transparent; box-shadow: none; }
+.memeImage { aspect-ratio: 1.12; border-radius: 9px; }
+.memeTop, .memeBottom { font-size: clamp(19px, 1.8vw, 27px); }
+.ratingGroup { grid-template-columns: auto auto auto; align-items: center; justify-content: center; gap: 5px; margin-top: 8px; border-bottom: 1px solid #d9cebd; padding-bottom: 8px; }
+.ratingGroup .voteCount { grid-column: 2; color: #26334b; font-size: 11px; font-weight: 700; text-align: left; }
+.ratingGroup .voteButton { width: 40px; min-width: 40px; min-height: 40px; }
+.ratingGroup > a { grid-column: 3; text-align: right; }
+.ratingGroup p { grid-column: 1 / -1; }
+.browseControls { align-items: center; margin: 1px 0 3px; border-bottom: 1px solid #d9cebd; padding: 0 0 4px; }
+.browseControls button { min-width: 50px; min-height: 36px; font-size: 12px; }
+.browseControls button span { display: none; }
+
+/* Wall: larger paper cards with the city scene still visible behind them. */
+.standaloneFeed { width: min(100%, 1400px); padding: 34px clamp(18px, 4vw, 60px) 45px; }
+.standaloneFeed .feedIntro { align-items: center; margin-bottom: 26px; }
+.standaloneFeed .feedIntro .wallLeadTitle { flex: 1; }
+.standaloneFeed .feedIntro h1 { color: #fff5e6; font: 400 clamp(36px, 3.7vw, 54px)/1 "Lilita One", Impact, sans-serif; }
+.standaloneFeed .feedIntro h1 em { color: #ffc28f; font-style: normal; }
+.standaloneFeed .feedIntro .wallLeadTitle > p:last-child { max-width: none; margin-top: 10px; color: #c9d0dd; }
+.standaloneFeed .feedIntro .eyebrow { color: #ffbb92; font-size: 8px; letter-spacing: .18em; }
+.standaloneFeed .feedBack { min-height: 42px; border-color: #516078; background: #14213a; padding: 0 16px; color: #fff1df; }
+.wallTools { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #8390a044; border-bottom: 1px solid #8390a044; padding: 12px 0; }
+.standaloneFeed .locationFilters { flex-wrap: nowrap; margin: 0; }
+.standaloneFeed .locationFilters button { min-height: 40px; font-size: 11px; }
+.wallSearch { display: flex; gap: 8px; }
+.wallSearch input, .wallSearch button { min-height: 40px; border: 1px solid #41506a; border-radius: 8px; background: #101d32; padding: 0 13px; color: #f5eee2; font: 11px var(--font-geist), sans-serif; }
+.wallSearch input { width: min(230px, 18vw); }
+.wallSearch input::placeholder { color: #aab4c4; }
+.wallMeta { display: flex; justify-content: space-between; margin: 18px 0 13px; color: #d5ddea; font-size: 10px; }
+.wallMeta span:last-child { color: #75869f; font: 7px var(--font-geist), sans-serif; letter-spacing: .18em; }
+.standaloneFeed .memeGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.standaloneFeed .feedCard { overflow: hidden; border: 0; border-radius: 13px; background: #f6eddc; color: #15213a; box-shadow: 0 12px 32px #02081766; }
+.wallCardLabel { display: flex; min-height: 37px; align-items: center; justify-content: space-between; padding: 0 15px; color: #726d62; font-size: 9px; }
+.wallCardLabel span:first-child { color: #38455a; font-weight: 700; }
+.standaloneFeed .feedImage { margin: 0 12px; aspect-ratio: 1.12; border-radius: 8px; }
+.standaloneFeed .memeTop, .standaloneFeed .memeBottom { font-size: clamp(17px, 1.65vw, 25px); }
+.wallCardFoot { display: flex; min-height: 48px; align-items: center; justify-content: space-between; padding: 0 13px; color: #807768; font-size: 9px; }
+.standaloneFeed .wallCardScore { display: inline-flex; min-height: 34px; align-items: center; border: 1px solid #d4c6b2; border-radius: 999px; background: #fff9ef; padding: 0 12px; color: #17243a; font-size: 11px; }
+.standaloneFeed .feedRatings { display: grid; grid-template-columns: auto auto auto; justify-content: center; gap: 5px; margin: 0; padding: 0 8px 11px; }
+.standaloneFeed .feedRatings > span { grid-column: 1 / -1; font-size: 10px; }
+.standaloneFeed .feedRatings > .voteCount { grid-column: 2; }
+.standaloneFeed { width: min(100%, 1320px); }
+.shell:has(.standaloneFeed) { background: linear-gradient(180deg, #0d192bd9, #0d192be8), url("/room/playground/nyc/overview-night-v1.webp") center top / cover fixed; }
+.standaloneFeed .feedImage { aspect-ratio: 1.22; }
+.wallCardFoot { border-top: 1px dashed #d7c9b5; }
+.standaloneFeed .feedRatings { grid-template-columns: auto auto auto; }
+.standaloneFeed .feedRatings .voteButton { width: 40px; min-width: 40px; min-height: 40px; }
+.wallSearch select { min-width: 126px; min-height: 40px; appearance: none; border: 1px solid #41506a; border-radius: 8px; background-color: #101d32; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23f5eee2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding: 0 34px 0 10px; color: #f5eee2; font: 11px var(--font-geist), sans-serif; }
+.hostAnimal { width: 60px; height: 60px; border: 3px solid #fff1d9; border-radius: 50%; background-repeat: no-repeat; box-shadow: 0 4px 12px #09101d9c; filter: none; }
+.hostButton { gap: 6px; }
+.hostButton > span:last-child { min-height: 40px; border: 1px solid #fff1d9cc; border-radius: 999px; background: #17243bdd; padding: 0 13px; color: #fff4e3; font: 700 12px var(--font-geist), sans-serif; }
+.hostButton[aria-pressed="true"] > span:last-child { border-color: #ffbf97; background: #17243bdd; outline: 2px solid #ffbf9788; }
+.hostSelected > span:last-child { box-shadow: 0 4px 12px #07101d72; }
+.hostButton:hover > span:last-child { background: #273752f2; }
+.hostButton .reactionSpark { top: -5px; right: -4px; }
+.standaloneFeed .feedRatings > span { display: block; }
+@media (max-width: 1100px) {
+  .sharedNav { grid-template-columns: 210px auto 1fr; }
+  .sharedHud .brand, .brand { width: 195px; }
+  .sharedNavCenter { gap: 15px; }
+  .sharedAccount { gap: 8px; }
+  .sharedAccount .createPill { padding-inline: 13px; }
+  .experience { --scene-shift: 0px; display: flex; flex-direction: column; padding: 0 14px 20px; }
+  .world { height: clamp(430px, 67dvh, 620px); flex: none; }
+  .viewer { position: relative; top: auto; right: auto; width: min(500px, calc(100% - 28px)); max-height: none; align-self: flex-end; overflow: visible; margin: -72px 10px 0 0; transform: none; }
+  .cityIntro { top: 5%; left: 5%; width: min(360px, 45vw); }
+  .standaloneFeed .memeGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wallTools { align-items: flex-start; flex-direction: column; }
+  .wallSearch input { width: min(320px, 55vw); }
+}
+@media (max-width: 640px) {
+  .hud, .sharedHud { min-height: 66px; }
+  .sharedHud { padding: 6px 10px; }
+  .sharedNav { grid-template-columns: minmax(56px, 1fr) auto auto; gap: 6px; }
+  .brand, .sharedHud .brand { width: 60px; height: 46px; gap: 0; }
+  .brandImage { width: 56px; height: 42px; }
+  .brandWords { display: none; }
+  .sharedNavCenter { gap: 10px; }
+  .sharedNavCenter a, .sharedNavCenter button { font-size: 10px; }
+  .sharedAccount { gap: 5px; }
+  .sharedAccount .createPill { min-height: 36px; gap: 4px; padding: 0 8px; font-size: 10px; }
+  .sharedAccount .avatarLink { width: 32px; min-height: 32px; }
+  .sharedAccount .profileLink { width: auto; min-height: 32px; padding: 0 9px; font-size: 10px; }
+  .sharedNav { grid-template-columns: 58px minmax(0, 1fr) auto; }
+  .sharedNavCenter { justify-self: center; gap: 6px; }
+  .sharedNavCenter a, .sharedNavCenter button { font-size: 9px; }
+  .sharedAccount .createPill { padding-inline: 6px; font-size: 9px; }
+  .sharedAccount .avatarLink { width: 28px; min-height: 28px; }
+  .sharedAccount .profileLink { width: auto; min-height: 28px; padding: 0 7px; font-size: 9px; }
+  .experience { padding: 0 8px 14px; }
+  .world { height: 430px; border-radius: 12px; }
+  .cityIntro { top: 5%; left: 5%; width: 78%; }
+  .streetBack { top: 12px; right: 25px; }
+  .cityIntro .eyebrow { margin-bottom: 10px; font-size: 8px; }
+  .cityIntro h1 { max-width: 300px; font-size: 38px; }
+  .photoMarker { width: 89px; }
+  .markerPhoto { width: 84px; height: 72px; min-height: 72px; flex: 0 0 72px; border-width: 4px; border-bottom-width: 24px; }
+  .markerPhoto img { inset: 4px 4px auto !important; width: 76px !important; height: 40px !important; object-fit: cover; transform: none !important; }
+  .photoMarkerLabel { bottom: 2px; font-size: 12px; }
+  .markerNote { font-size: 6px; }
+  .viewer { width: calc(100% - 14px); margin: -18px 7px 0; border-width: 5px; border-radius: 16px; padding: 13px 13px 0; }
+  .memeImage { aspect-ratio: 1.25; }
+  .memeTop, .memeBottom { font-size: clamp(17px, 5vw, 24px); }
+  .standaloneFeed { padding: 24px 13px 30px; }
+  .standaloneFeed .feedIntro { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .standaloneFeed .feedIntro h1 { font-size: 38px; }
+  .standaloneFeed .locationFilters { max-width: 100%; overflow-x: auto; }
+  .standaloneFeed .locationFilters button { flex: none; }
+  .standaloneFeed .memeGrid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .standaloneFeed .feedImage { aspect-ratio: 1.12; }
+  .standaloneFeed .memeTop, .standaloneFeed .memeBottom { font-size: clamp(21px, 6vw, 30px); }
+  .wallMeta span:last-child { display: none; }
+  .wallSearch { width: 100%; }
+  .wallSearch input { width: 100%; }
+  .artArea .scene { top: 0; left: 0; width: 100%; height: 100%; aspect-ratio: auto; background-size: cover; transform: none; }
+  .artArea .mapScene { opacity: 1; filter: brightness(.78) saturate(.85); -webkit-mask-image: none; mask-image: none; }
+  .artArea .streetScene { opacity: 0; transform: none; }
+  .artArea .streetSceneActive { opacity: 1; }
+  .streetView .artArea .mapScene { opacity: 0; transform: none; filter: blur(2px); }
+  .artArea .mapMarkers, .artArea .streetHosts { top: 0; left: 0; width: 100%; height: 100%; aspect-ratio: auto; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .photoMarker, .viewer, .mapScene, .streetScene { transition-duration: .01ms !important; } }
+
+/* Keep the postcard route aligned to the same 1586 × 992 map artwork as its pins. */
+.mapMarkers .mapRoute { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; pointer-events: none; transition: opacity 180ms ease; }
+.mapMarkers:has(.photoMarker:hover, .photoMarker:focus-visible) .mapRoute { opacity: 1; }
+.mapMarkers .photoMarker:hover, .mapMarkers .photoMarker:focus-visible { outline: none; background: radial-gradient(circle, #ffb7774a 0 35%, #ffb77724 52%, transparent 73%); box-shadow: none; filter: brightness(1.1) drop-shadow(0 0 16px #ffb77770); }
+.mapRoute path { fill: none; stroke: #ffe4c6; stroke-width: .16; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: .45 .72; opacity: .88; filter: drop-shadow(0 0 .18px #0a1425); }
+.mapRoute .mobileRoute { display: none; }
+.mapMarkers .photoMarker { z-index: 1; width: 126px; overflow: visible; }
+.mapMarkers .photoMarker:nth-of-type(1) { rotate: -3deg; }
+.mapMarkers .photoMarker:nth-of-type(2) { rotate: 2deg; }
+.mapMarkers .photoMarker:nth-of-type(3) { rotate: -2deg; }
+.mapMarkers .markerPhoto { width: 120px; height: 98px; overflow: visible; border: 5px solid #fff3dc; border-bottom-width: 26px; border-radius: 5px; background: #fff3dc; box-shadow: 0 1px 0 #deceb4, 0 5px 12px #07101e70; }
+.mapMarkers .markerImage { position: absolute; top: 5px; right: 5px; left: 5px; height: 62px; overflow: hidden; border-radius: 1px; }
+.mapMarkers .markerImage img { inset: 0 !important; width: 100% !important; height: 100% !important; object-fit: cover; }
+.mapMarkers .photoMarkerLabel { right: 4px; bottom: -21px; left: 5px; color: #18243a; font: 18px/1 "Patrick Hand", cursive; text-align: left; text-shadow: none; }
+.mapMarkers .photoMarkerLabel i { float: right; font: 12px var(--font-geist), sans-serif; }
+.mapMarkers .photoMarker::after { display: none; }
+.mapMarkers .photoMarker .markerDot { width: 8px; height: 8px; margin-top: 5px; border: 2px solid #fff0d8; box-shadow: 0 0 0 4px #ff806d4a, 0 0 14px #ff806d; }
+@media (max-width: 900px) {
+  /* Size the overlay to the cover-cropped map image so pins and route share its geography. */
+  .artArea .mapMarkers { top: 0; left: 50%; width: auto; height: 100%; aspect-ratio: 1586 / 992; transform: translateX(-50%); }
+  .mapMarkers .photoMarker { width: 95px; }
+  .mapMarkers .markerPhoto { width: 91px; height: 87px; flex: 0 0 auto; border-width: 4px; border-bottom-width: 23px; }
+  .mapMarkers .markerImage { top: 4px; right: 4px; left: 4px; height: 54px; }
+  .mapMarkers .photoMarker { height: auto; min-height: 0; }
+  .mapMarkers .photoMarkerLabel { bottom: -18px; font-size: 15px; }
+  .mapMarkers .photoMarker .markerDot { position: relative; right: auto; bottom: auto; width: 8px; height: 8px; margin-top: 4px; flex: 0 0 auto; }
+  .mapMarkers .campusMarker { --marker-y: 46% !important; }
+  .mapMarkers .ktownMarker { --marker-y: 67% !important; }
+  .mapMarkers .eastVillageMarker { --marker-y: 74% !important; }
+  .mapRoute .desktopRoute { display: none; }
+  .mapRoute .mobileRoute { display: block; }
+  .mapRoute .mobileRoute { stroke-width: .18; opacity: .86; }
+}
+@media (max-width: 430px) {
+  .mapMarkers .photoMarker { width: 70px; }
+  .mapMarkers .markerPhoto { width: 66px; height: 58px; border-width: 4px; border-bottom-width: 15px; }
+  .mapMarkers .markerImage { height: 37px; }
+  .mapMarkers .photoMarkerLabel { bottom: -14px; font-size: 10px; }
+  .mapMarkers .photoMarkerLabel i { font-size: 8px; }
 }

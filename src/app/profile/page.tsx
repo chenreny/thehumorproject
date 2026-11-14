@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { SiteNav } from "@/components/site-nav";
+import { CityBanner } from "@/components/city-banner";
 import { requireProfile } from "@/lib/profile";
 import { ProfileForm } from "./profile-form";
 import styles from "./profile.module.css";
@@ -31,9 +31,8 @@ export default async function ProfilePage({
 
   return (
     <main className={`page-shell ${styles.profilePage} create-page`}>
+      <CityBanner active="profile" className={styles.fullBleedBanner} />
       <div className="page-width">
-        <SiteNav signedIn active="profile" />
-
         <div className={styles.profileWrap}>
           <header className={styles.heading}>
             <div>
