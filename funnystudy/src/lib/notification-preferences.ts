@@ -18,9 +18,10 @@ export function notificationNextPath(value: string | string[] | null | undefined
 }
 
 export function buildNotificationPreferencesPath(next: string, message?: string) {
-  const params = new URLSearchParams({ next: notificationNextPath(next) });
+  const target = notificationNextPath(next);
+  const params = new URLSearchParams({ next: target });
   if (message) params.set("message", message);
-  return `/notification-preferences?${params}`;
+  return `/settings?${params}#reminders`;
 }
 
 export function readNotificationSkips(value: string | undefined, profileId: string): NotificationPreference[] {

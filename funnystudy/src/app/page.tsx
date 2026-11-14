@@ -3,22 +3,21 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 
+import { NotificationHome } from "@/components/NotificationHome";
+import { phoneSettingsForUser } from "@/lib/phone-settings";
+import type { AccountSettings } from "@/lib/account-settings";
 import { AccountMenu } from "@/components/AccountMenu";
 import { LocalDateTime } from "@/components/LocalDateTime";
 import { SubmitButton } from "@/components/SubmitButton";
 import { ThemeMenu } from "@/components/theme/ThemeMenu";
 import { buildDemographicsPath, hasPendingDemographicQuestions } from "@/lib/demographics";
 import { DEMOGRAPHIC_SKIPS_COOKIE, readDemographicSkips } from "@/lib/demographic-skips";
-import { buildNotificationPreferencesPath, fetchNotificationPreferences, NOTIFICATION_SKIPS_COOKIE, readNotificationSkips } from "@/lib/notification-preferences";
 import { fetchPublicActiveStudyIdentities } from "@/lib/studies";
 import { createClient } from "@/lib/supabase/server";
 import { fetchStudyParticipations, isStudyCompleted } from "@/lib/study-participation";
 import type { TablesUpdate } from "@/types/supabase";
 
-type Profile = {
-  first_name: string | null;
-  last_name: string | null;
-};
+type Profile = AccountSettings;
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
@@ -42,10 +41,6 @@ export default async function Home({
   }
 
   const cookieStore = await cookies();
-  const skippedNotifications = readNotificationSkips(cookieStore.get(NOTIFICATION_SKIPS_COOKIE)?.value, user.id);
-  if ((await fetchNotificationPreferences(supabase, user.id, skippedNotifications)).pending.length) {
-    redirect(buildNotificationPreferencesPath("/"));
-  }
 
   const skippedQuestionIds = readDemographicSkips(
     cookieStore.get(DEMOGRAPHIC_SKIPS_COOKIE)?.value,
@@ -63,7 +58,7 @@ export default async function Home({
     await Promise.all([
       supabase
         .from("profiles")
-        .select("first_name, last_name")
+        .select("first_name, last_name, notify_new_study_email, notify_new_study_sms, notify_new_study_phone_call")
         .eq("id", user.id)
         .single(),
       fetchPublicActiveStudyIdentities(supabase, studyNow),
@@ -109,6 +104,7 @@ export default async function Home({
         id="home-content"
         className="relative mx-auto min-h-0 w-full max-w-3xl flex-1 overflow-y-auto overscroll-contain p-1"
       >
+        <NotificationHome settings={profile} phone={phoneSettingsForUser(user)} userId={user.id} email={user.email} handled={user.user_metadata?.notification_setup_handled === true} />
         {activeStudyIdentitiesError ? (
           <div className="glass-panel rounded-2xl p-6 text-center sm:p-8">
             <h1 className="text-2xl font-bold text-[var(--error-text)]">
@@ -124,7 +120,7 @@ export default async function Home({
           </div>
         ) : (
           <>
-            <header className="mb-6 space-y-2 sm:mb-8">
+            <header className="mb-5 space-y-1 sm:mb-6">
               <h1 className="text-3xl font-bold sm:text-4xl">Active studies</h1>
               <p className="text-sm text-[var(--muted)] sm:text-base">
                 Choose a study to start rating captions.

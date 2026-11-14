@@ -35,7 +35,7 @@ export async function updatePhoneNumber(
         : "We couldn’t send a verification code. Please try again." };
     }
     revalidatePath("/settings");
-    return { ...state, pendingPhone: phone, status: "sent", message: `A verification code is on its way to ${phone}.` };
+    return { ...state, pendingPhone: phone, status: "sent", message: `Code requested for ${phone}. If text delivery is available, check that number.` };
   }
 
   if (operation === "verify") {

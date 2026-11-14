@@ -7,7 +7,7 @@ import {
 } from "@/lib/demographics";
 import { createClient } from "@/lib/supabase/server";
 import { DEMOGRAPHIC_SKIPS_COOKIE } from "@/lib/demographic-skips";
-import { buildNotificationPreferencesPath, fetchNotificationPreferences, notificationNextPath, NOTIFICATION_SKIPS_COOKIE } from "@/lib/notification-preferences";
+import { notificationNextPath, NOTIFICATION_SKIPS_COOKIE } from "@/lib/notification-preferences";
 
 const FALLBACK_SITE_URL = "http://localhost:3000";
 
@@ -73,12 +73,6 @@ export async function GET(request: Request) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
-    if (user && (await fetchNotificationPreferences(supabase, user.id)).pending.length) {
-      const response = NextResponse.redirect(new URL(buildNotificationPreferencesPath(next), redirectOrigin), 303);
-      response.cookies.set({ name: "login_next", value: "", maxAge: 0, path: "/" });
-      return response;
-    }
 
     if (user && (await hasPendingDemographicQuestions(supabase, user.id))) {
       const demographicsUrl = new URL(

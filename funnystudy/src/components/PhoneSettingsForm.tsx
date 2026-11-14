@@ -7,10 +7,11 @@ import type { PhoneSettingsState } from "@/lib/phone-settings";
 import { SubmitButton } from "./SubmitButton";
 import { PolicyLinks } from "./PolicyLinks";
 
-export function PhoneSettingsForm({ initialState, onVerified, onPendingPhone }: {
+export function PhoneSettingsForm({ initialState, onVerified, onPendingPhone, compact = false }: {
   initialState: PhoneSettingsState;
   onVerified?: (phone: string) => void;
   onPendingPhone?: (phone: string) => void;
+  compact?: boolean;
 }) {
   const [stage, setStage] = useState<"number" | "code">(initialState.pendingPhone ? "code" : "number");
   const [state, action, pending] = useActionState(async (previousState: PhoneSettingsState, formData: FormData) => {
@@ -43,15 +44,16 @@ export function PhoneSettingsForm({ initialState, onVerified, onPendingPhone }: 
   const currentStage = stage;
 
   return (
-    <section ref={sectionRef} className="phone-setup-card rounded-2xl border p-4 sm:p-5" aria-labelledby={headingId}>
-        <div className="mb-4 flex items-start justify-between gap-3">
+    <section ref={sectionRef} className="phone-setup-card rounded-2xl border p-4 sm:p-5" aria-labelledby={compact ? undefined : headingId} aria-label={compact ? "Phone verification" : undefined}>
+        {compact ? <header className="notification-phone-heading"><div className="notification-top"><span className="notification-tag">VERIFY YOUR PHONE</span><span>{currentStage === 'code' ? '2' : '1'} of 2</span></div><h1>{currentStage === 'code' ? 'Check your messages.' : 'Let’s check your number.'}</h1><p className="notification-description">{currentStage === 'code' ? <>Enter the six-digit code for<br /><strong>{state.pendingPhone}</strong>.</> : 'We’ll use a verification text to check it’s yours. This won’t turn on reminders.'}</p>{state.verifiedPhone ? <p className="notification-verification-note">Your current number stays verified until the replacement is confirmed.</p> : null}</header> : null}
+        {!compact ? <div className="mb-4 flex items-start justify-between gap-3">
           <div>
             <p className="phone-setup-accent-text text-xs font-bold uppercase tracking-[0.16em]">Step {currentStage === "code" ? "2" : "1"} of 2</p>
             <h4 id={headingId} className="mt-1 text-base font-bold text-[var(--foreground)]">{currentStage === "code" ? "Enter the code from your text" : "First, verify your phone number"}</h4>
-            <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{currentStage === "code" ? `We sent a six-digit code to ${state.pendingPhone}.` : "Once you enter the code, you can decide whether to receive texts, calls, both, or neither."}</p>
+            <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{currentStage === "code" ? `Enter the six-digit code requested for ${state.pendingPhone}. If text delivery is available, check that number.` : "Once you enter the code, you can decide whether to receive texts, calls, both, or neither."}</p>
           </div>
           <span aria-hidden="true" className="phone-setup-icon grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg">☎</span>
-        </div>
+        </div> : null}
 
       {currentStage === "number" ? (
         <form action={action} className="space-y-3">
@@ -79,7 +81,7 @@ export function PhoneSettingsForm({ initialState, onVerified, onPendingPhone }: 
               <input type="text" name="code" inputMode="numeric" autoComplete="one-time-code" autoFocus
                 required pattern="[0-9]{6}" minLength={6} maxLength={6} placeholder="••••••" className={`${inputClass} tracking-[0.35em]`} />
             </label>
-            <p className="text-xs leading-5 text-[var(--muted)]">Code sent to <span className="font-semibold text-[var(--foreground)]">{state.pendingPhone}</span></p>
+            <p className="text-xs leading-5 text-[var(--muted)]">Code requested for <span className="font-semibold text-[var(--foreground)]">{state.pendingPhone}</span></p>
             <div className="flex flex-wrap items-center gap-3">
               <SubmitButton pendingLabel="Verifying…" className={primaryClass}>Verify number →</SubmitButton>
               <button type="button" className={secondaryClass} onClick={() => setStage("number")}>Edit number</button>

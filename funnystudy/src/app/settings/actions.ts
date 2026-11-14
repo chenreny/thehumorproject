@@ -37,6 +37,28 @@ export async function updateAccountSettings(
   return saveSettings(supabase, user.id, update, "Name and email preference saved.");
 }
 
+export async function updateProfileNames(
+  _previousState: SettingsFormState,
+  formData: FormData
+): Promise<SettingsFormState> {
+  const supabase = await createClient({ allowCookieWrite: true });
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const first = formData.get("first_name");
+  const last = formData.get("last_name");
+  if (typeof first !== "string" || typeof last !== "string" ||
+    first.trim().length < 2 || last.trim().length < 2) {
+    return { status: "error", message: "Please enter a first and last name with at least two characters each." };
+  }
+
+  return saveSettings(supabase, user.id, {
+    first_name: first.trim(),
+    last_name: last.trim(),
+    modified_by_user_id: user.id,
+  }, "Your name was saved.");
+}
+
 export async function updatePhoneNotificationSettings(
   _previousState: SettingsFormState,
   formData: FormData

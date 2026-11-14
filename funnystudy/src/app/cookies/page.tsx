@@ -17,8 +17,8 @@ export default function CookiesPage() {
         <ul>
           <li><strong>Authentication cookies:</strong> Supabase cookies maintain and refresh your signed-in session. Their lifetime depends on your authentication session and refresh behavior. Signing out clears this site’s authentication session.</li>
           <li><strong>Sign-in destination:</strong> The login_next cookie remembers the page you requested while Google sign-in completes. It expires after ten minutes.</li>
-          <li><strong>Skipped questions:</strong> The demographic_skips and notification_skips session cookies remember questions you skip during the current login. Successful sign-in clears these skips so unanswered questions can be asked again.</li>
-          <li><strong>Theme:</strong> Local storage named theme-preference remembers your light, dark, or system theme until you change it or clear browser storage.</li>
+          <li><strong>Skipped questions:</strong> The demographic_skips and notification_skips session cookies remember questions you skip during the current login. Successful sign-in clears these skips; unanswered reminder choices remain available in Settings without another automatic invitation.</li>
+          <li><strong>Theme and reminder offer:</strong> Local storage remembers your theme and whether the optional offer shown when leaving a study has already appeared in this browser. This record does not subscribe you to reminders; you can change choices in Settings.</li>
           <li><strong>Study session:</strong> Session storage named captionVoteSessionId holds a random session identifier used with caption activity records. Session storage normally lasts for the browser tab’s session; browser session restoration may retain it.</li>
         </ul>
       </section>
@@ -30,7 +30,7 @@ export default function CookiesPage() {
       </section>
       <section>
         <h2>Your controls</h2>
-        <p>You can use browser settings to block or clear cookies, local storage, and session storage, and can change your theme from the account menu. Blocking authentication storage may prevent sign-in or saving study progress. Clearing stored skips may cause unanswered questions to reappear.</p>
+        <p>You can use browser settings to block or clear cookies, local storage, and session storage, and can change your theme from the account menu. Blocking authentication storage may prevent sign-in or saving study progress. Clearing browser storage may make the optional study-exit offer appear again.</p>
         <p>Clearing browser storage does not delete information already saved to your account or study records. Contact <a href="mailto:michael@sparklingjavascript.com">michael@sparklingjavascript.com</a> for questions or a personal-information request.</p>
       </section>
     </PolicyPage>

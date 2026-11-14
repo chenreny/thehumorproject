@@ -36,6 +36,9 @@ const notificationModule = loadModule("src/lib/notification-preferences.ts", {
   "@/lib/account-settings": settingsModule, "@/lib/url": urls, "@/lib/supabase/server": {},
 });
 const phoneModule = loadModule("src/lib/phone-settings.ts");
+const journeyModule = loadModule("src/lib/notification-journey.ts");
+const reminderOfferModule = loadModule("src/lib/reminder-offer.ts");
+const reminderChoiceModule = loadModule("src/components/ReminderChoiceControl.tsx");
 const submitModule = loadModule("src/components/SubmitButton.tsx");
 const Link = ({ children, ...props }) => {
   delete props.prefetch;
@@ -47,6 +50,17 @@ const initialProfile = {
   id: "participant-a", first_name: "Test", last_name: "Participant",
   notify_new_study_email: false, notify_new_study_sms: true, notify_new_study_phone_call: false,
 };
+
+test("study exit reminder offer appears once per browser user", () => {
+  const values = new Map();
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  };
+  assert.equal(reminderOfferModule.claimStudyExitOffer(storage, "participant-a"), true);
+  assert.equal(reminderOfferModule.claimStudyExitOffer(storage, "participant-a"), false);
+  assert.equal(reminderOfferModule.claimStudyExitOffer(storage, "participant-b"), true);
+});
 
 test("browser, server and proxy ignore shared auth cookies and local logout preserves other apps", async () => {
   const ssr = require("@supabase/ssr");
@@ -139,7 +153,8 @@ function createScenario({ signedIn = true, readError = false, writeError = false
       updateUser: async (payload) => {
         phoneRequests.push({ operation: "send", payload });
         if (phoneError) return { data: { user: null }, error: phoneError };
-        user.new_phone = payload.phone;
+        if (payload.data) user.user_metadata = { ...user.user_metadata, ...payload.data };
+        else user.new_phone = payload.phone;
         return { data: { user: { ...user } }, error: null };
       },
       verifyOtp: async (payload) => {
@@ -198,19 +213,32 @@ function createScenario({ signedIn = true, readError = false, writeError = false
     "./PolicyLinks": policyLinksModule,
   });
   const form = loadModule("src/components/SettingsForm.tsx", {
+    "next/link": { default: Link },
+    "next/navigation": { useRouter: () => ({ refresh() {} }) },
     "@/app/settings/actions": actions,
+    "@/lib/notification-journey": journeyModule,
+    "./NotificationDialog": { NotificationDialog: () => null },
+    "./NotificationJourney": { NotificationJourney: () => null },
+    "./NotificationIcon": loadModule("src/components/NotificationIcon.tsx"),
+    "@/app/notification-preferences/save-journey": loadModule("src/app/notification-preferences/save-journey.ts", imports),
     "@/lib/account-settings": settingsModule,
+    "@/lib/reminder-offer": reminderOfferModule,
     "./PhoneSettingsForm": phoneForm,
     "./PolicyLinks": policyLinksModule,
+    "./ReminderChoiceControl": reminderChoiceModule,
   });
   const page = loadModule("src/app/settings/page.tsx", { ...imports, "@/components/SettingsForm": form,
     "@/components/PhoneSettingsForm": phoneForm });
   const notificationActions = loadModule("src/app/notification-preferences/actions.ts", imports);
-  const notificationPage = loadModule("src/app/notification-preferences/page.tsx", { ...imports, "./actions": notificationActions }).default;
+  const journeyActions = loadModule("src/app/notification-preferences/save-journey.ts", imports);
+  const notificationPage = loadModule("src/app/notification-preferences/page.tsx", { ...imports,
+    "@/components/NotificationJourney": { NotificationJourney: ({ next }) => createElement("div", { "data-journey-next": next }, "Reminder choices: Email, Text message, Phone call; Yes, No, Decide later") },
+  }).default;
   return {
-    notificationActions, notificationPage, phoneForm, cookieValues, cookieOptions,
+    notificationActions, journeyActions, notificationPage, phoneForm, cookieValues, cookieOptions,
     rows, requests, invalidations, clientOptions, user, phoneRequests,
     save: (data) => actions.updateAccountSettings(settingsModule.INITIAL_SETTINGS_STATE, data),
+    saveName: (data) => actions.updateProfileNames(settingsModule.INITIAL_SETTINGS_STATE, data),
     savePhonePreferences: (data) => actions.updatePhoneNotificationSettings(settingsModule.INITIAL_SETTINGS_STATE, data),
     savePhone: (data) => phoneActions.updatePhoneNumber(phoneModule.phoneSettingsForUser(user), data),
     render: async () => renderToStaticMarkup(await page.default()),
@@ -226,8 +254,10 @@ function formData({ first = "Jane", last = "Doe", channels = [] } = {}) {
 }
 
 function selectedPreference(html, name) {
-  const select = html.match(new RegExp(`<select[^>]*name="${name}"[^>]*>(.*?)</select>`))[1];
-  return select.match(/<option value="([^"]+)" selected="">/)[1];
+  const label = { notify_new_study_email: 'Email', notify_new_study_sms: 'Text messages', notify_new_study_phone_call: 'Phone calls' }[name];
+  const value = html.match(new RegExp(`<strong>${label}</strong>[\\s\\S]*?</dt><dd[^>]*><span[^>]*></span>(On|Off|Not set)</dd>`))?.[1];
+  assert.ok(value, `Missing saved summary for ${label}`);
+  return { On: 'yes', Off: 'no', 'Not set': 'skip' }[value];
 }
 
 const unanswered = Object.fromEntries(settingsModule.NOTIFICATION_SETTINGS.map(({ name }) => [name, null]));
@@ -238,26 +268,90 @@ function preferenceData(preference = "notify_new_study_email", next = "/study/42
   return data;
 }
 
+function journeyData({ email = "yes", sms = "no", call = "skip" } = {}) {
+  const data = new FormData();
+  data.set("notify_new_study_email", email);
+  data.set("notify_new_study_sms", sms);
+  data.set("notify_new_study_phone_call", call);
+  return data;
+}
+
+test("journey saves independent choices, retains Skip as NULL, and requires a verified phone for Yes", async () => {
+  const scenario = createScenario({ profileFields: unanswered });
+  const unverified = await scenario.journeyActions.saveNotificationJourney({ status: "idle", message: "" }, journeyData({ sms: "yes" }));
+  assert.equal(unverified.status, "error");
+  assert.equal(scenario.rows[0].notify_new_study_sms, null);
+  const saved = await scenario.journeyActions.saveNotificationJourney({ status: "idle", message: "" }, journeyData());
+  assert.equal(saved.status, "saved");
+  assert.equal(scenario.rows[0].notify_new_study_email, true);
+  assert.equal(scenario.rows[0].notify_new_study_sms, false);
+  assert.equal(scenario.rows[0].notify_new_study_phone_call, null);
+  assert.deepEqual(notificationModule.readNotificationSkips(scenario.cookieValues.get("notification_skips"), "participant-a"), ["notify_new_study_phone_call"]);
+  const verified = createScenario({ profileFields: unanswered, userFields: { phone: "+12125551234", phone_confirmed_at: "2026-10-03" } });
+  assert.equal((await verified.journeyActions.saveNotificationJourney({ status: "idle", message: "" }, journeyData({ sms: "yes", call: "yes" }))).status, "saved");
+  assert.equal(verified.rows[0].notify_new_study_sms, true);
+  assert.equal(verified.rows[0].notify_new_study_phone_call, true);
+});
+
+test("journey rejects malformed choices and failed writes without reporting success", async () => {
+  const scenario = createScenario({ profileFields: unanswered });
+  const data = journeyData();
+  data.append("notify_new_study_sms", "yes");
+  assert.equal((await scenario.journeyActions.saveNotificationJourney({ status: "idle", message: "" }, data)).status, "error");
+  assert.deepEqual(scenario.requests, []);
+  const failed = createScenario({ profileFields: unanswered, writeError: true });
+  assert.equal((await failed.journeyActions.saveNotificationJourney({ status: "idle", message: "" }, journeyData())).status, "error");
+  assert.equal(failed.cookieValues.size, 0);
+});
+
+test("Decide later clears an earlier answer without requiring phone verification", async () => {
+  const scenario = createScenario({ userFields: { phone: null, phone_confirmed_at: null } });
+  const result = await scenario.journeyActions.saveNotificationJourney({ status: "idle", message: "" }, journeyData({ email: "skip", sms: "skip", call: "no" }));
+  assert.equal(result.status, "saved");
+  assert.equal(scenario.rows[0].notify_new_study_email, null);
+  assert.equal(scenario.rows[0].notify_new_study_sms, null);
+  assert.deepEqual(notificationModule.readNotificationSkips(scenario.cookieValues.get("notification_skips"), "participant-a"), ["notify_new_study_email", "notify_new_study_sms"]);
+});
+
+test("notification drafts are validated and scoped to the signed-in user", () => {
+  const choices = journeyModule.savedChoices({ ...initialProfile, notify_new_study_sms: null });
+  assert.deepEqual(choices, { notify_new_study_email: false, notify_new_study_sms: false, notify_new_study_phone_call: false });
+  assert.equal(journeyModule.readNotificationDraft('invalid'), null);
+  assert.equal(journeyModule.readNotificationDraft(JSON.stringify({ choices: { ...choices, notify_new_study_sms: 'yes' }, stage: 'choices' })), null);
+  const draft = { choices, stage: 'verify' };
+  assert.deepEqual(journeyModule.readNotificationDraft(JSON.stringify(draft)), draft);
+  assert.notEqual(journeyModule.notificationDraftKey('a'), journeyModule.notificationDraftKey('b'));
+  assert.notEqual(journeyModule.notificationHandledKey('a'), journeyModule.notificationHandledKey('b'));
+});
+
+test("dismissing setup stores an account marker without enabling any channel", async () => {
+  const scenario = createScenario({ profileFields: unanswered });
+  assert.deepEqual(await scenario.journeyActions.markNotificationSetupHandled(), {});
+  assert.equal(scenario.user.user_metadata.notification_setup_handled, true);
+  assert.deepEqual(scenario.requests, []);
+  for (const { name } of settingsModule.NOTIFICATION_SETTINGS) assert.equal(scenario.rows[0][name], null);
+  const failed = createScenario({ phoneError: { status: 500 }, profileFields: unanswered });
+  assert.ok((await failed.journeyActions.markNotificationSetupHandled()).error);
+  assert.deepEqual(failed.requests, []);
+});
+
 test("nullable settings remain unanswered when saving only a name change", async () => {
   const scenario = createScenario({ profileFields: unanswered, userFields: { phone: "+12125551234", phone_confirmed_at: "2026-10-03" } });
   const html = await scenario.render();
   const data = formData();
   for (const { name } of settingsModule.NOTIFICATION_SETTINGS) {
-    assert.equal(selectedPreference(html, name), "unanswered");
+    assert.equal(selectedPreference(html, name), "skip");
     data.set(name, "unanswered");
   }
   assert.equal((await scenario.save(data)).status, "success");
   for (const { name } of settingsModule.NOTIFICATION_SETTINGS) assert.equal(scenario.rows[0][name], null);
 });
 
-test("notification prompt displays only unanswered channels and offers Yes, No and Skip", async () => {
+test("notification journey retains the study destination and includes all three channels", async () => {
   const scenario = createScenario({ profileFields: { notify_new_study_email: true, notify_new_study_sms: null, notify_new_study_phone_call: false } });
   const html = renderToStaticMarkup(await scenario.notificationPage({ searchParams: Promise.resolve({ next: "/study/42" }) }));
-  assert.match(html, /Would you like to receive a text message/);
-  assert.match(html, /name="preference" value="notify_new_study_sms"/);
-  assert.match(html, /name="next" value="\/study\/42"/);
-  for (const label of ["Yes", "No", "Skip"]) assert.ok(html.includes(`>${label}</span>`));
-  assert.ok(html.includes('href="/settings"'));
+  assert.match(html, /data-journey-next="\/study\/42"/);
+  for (const label of ["Email", "Text message", "Phone call", "Yes", "No", "Decide later"]) assert.ok(html.includes(label));
 });
 
 test("notification prompt rejects phone opt-ins until verification, while No and Skip remain available", async () => {
@@ -304,7 +398,7 @@ test("Skip leaves NULL in the database, uses a user-scoped session cookie, and a
   assert.equal(scenario.cookieOptions[0].httpOnly, true);
   assert.equal(scenario.cookieOptions[0].sameSite, "lax");
   assert.equal(scenario.cookieOptions[0].maxAge, undefined);
-  assert.match(renderToStaticMarkup(await scenario.notificationPage({})), /Would you like to receive a text message/);
+  assert.match(renderToStaticMarkup(await scenario.notificationPage({})), /Reminder choices/);
 });
 
 test("all skipped choices finish without a home redirect loop and retain NULL preferences", async () => {
@@ -312,14 +406,13 @@ test("all skipped choices finish without a home redirect loop and retain NULL pr
   for (const { name } of settingsModule.NOTIFICATION_SETTINGS) {
     await assert.rejects(() => scenario.notificationActions.skipNotification(preferenceData(name)), Redirect);
   }
-  await assert.rejects(() => scenario.notificationPage({ searchParams: Promise.resolve({ next: "/study/42" }) }), (error) => error.path === "/study/42");
+  assert.match(renderToStaticMarkup(await scenario.notificationPage({ searchParams: Promise.resolve({ next: "/study/42" }) })), /data-journey-next="\/study\/42"/);
   for (const { name } of settingsModule.NOTIFICATION_SETTINGS) assert.equal(scenario.rows[0][name], null);
 });
 
-test("finishing notifications continues pending demographics before the original destination", async () => {
+test("notification choices retain the original destination while demographics are pending", async () => {
   const scenario = createScenario({ pendingDemographics: true });
-  await assert.rejects(() => scenario.notificationPage({ searchParams: Promise.resolve({ next: "/study/42" }) }),
-    (error) => error.path === "/demographics?next=%2Fstudy%2F42");
+  assert.match(renderToStaticMarkup(await scenario.notificationPage({ searchParams: Promise.resolve({ next: "/study/42" }) })), /data-journey-next="\/study\/42"/);
 });
 
 test("stale prompt submissions cannot overwrite an answered preference", async () => {
@@ -373,35 +466,28 @@ test("settings load only the signed-in profile and hydrate its name and independ
   const html = await scenario.render();
   assert.ok(html.includes('name="first_name"') && html.includes('value="Test"'));
   assert.ok(html.includes('name="last_name"') && html.includes('value="Participant"'));
-  assert.equal(selectedPreference(html, "notify_new_study_email"), "off");
-  assert.ok(!html.includes('name="notify_new_study_sms"'));
-  assert.ok(!html.includes('name="notify_new_study_phone_call"'));
-  assert.equal((html.match(/>Save changes<\/button>/g) ?? []).length, 1);
+  assert.equal(selectedPreference(html, "notify_new_study_email"), "no");
+  assert.equal(selectedPreference(html, "notify_new_study_sms"), "yes");
+  assert.equal(selectedPreference(html, "notify_new_study_phone_call"), "no");
+  assert.ok(html.includes("Edit preferences") && html.includes("Save name"));
   assert.ok(html.includes('id="settings-content"'));
-  assert.ok(html.includes('id="settings-form"') && !html.includes('id="phone-notification-form"'));
-  assert.ok(html.includes('Phone number, including country code'));
+  assert.ok(html.includes('id="reminders"') && html.includes('id="settings-profile-title"'));
+  assert.ok(!html.includes('Review all reminder choices'), "Settings changes choices directly without restarting setup");
+  assert.ok(html.includes('aria-labelledby="settings-notifications-title"'));
   assert.ok(!html.includes('aria-labelledby="verification-dialog-heading"'));
   assert.ok(!html.includes("Compare layout:"));
   assert.deepEqual(scenario.requests[0].filters, [["id", "participant-a"]]);
 });
 
-test("settings offers inline phone verification while gating phone choices", async () => {
+test("settings shows saved preferences separately from the name form and provides an editor", async () => {
   const scenario = createScenario();
   const html = await scenario.render();
-  assert.ok(html.includes('Phone number, including country code'));
-  assert.ok(!html.includes('aria-labelledby="verification-dialog-heading"'));
-  assert.ok(!html.includes('name="notify_new_study_sms"'));
-  assert.ok(!html.includes('form="phone-notification-form"'));
-  const verified = createScenario({ userFields: { phone: "+12125551234", phone_confirmed_at: "2026-10-03" } });
+  assert.ok(html.includes('Edit preferences'));
+  assert.ok(html.includes('No verified phone number'));
+  assert.ok(!html.includes('name="notify_new_study_sms"'), 'Name saves cannot submit notification values');
+  const verified = createScenario({ userFields: { phone: '+12125551234', phone_confirmed_at: '2026-10-03' } });
   const verifiedHtml = await verified.render();
-  assert.ok(verifiedHtml.includes('name="notify_new_study_sms"'));
-  assert.ok(verifiedHtml.includes('name="notify_new_study_phone_call"'));
-  assert.ok(verifiedHtml.includes('id="phone-notification-form"'));
-  const replacing = createScenario({ userFields: { phone: "+12125551234", phone_confirmed_at: "2026-10-03", new_phone: "+13105551234" } });
-  const replacingHtml = await replacing.render();
-  assert.ok(replacingHtml.includes("Phone number verified"));
-  assert.ok(replacingHtml.includes('name="code"'));
-  assert.ok(replacingHtml.includes('name="notify_new_study_sms"'));
+  assert.ok(verifiedHtml.includes('Phone verified') && verifiedHtml.includes('+12125551234'));
 });
 
 test("phone verification shows one numbered stage at a time and supports edit and consented resend", async () => {
@@ -419,7 +505,7 @@ test("phone verification shows one numbered stage at a time and supports edit an
   assert.ok(codeStage.includes('name="verification_sms_consent"'));
   assert.ok(codeStage.includes("Edit number") && codeStage.includes("Resend code"));
   assert.ok(!codeStage.includes('type="tel" name="phone"'));
-  assert.ok(codeStage.includes("Code sent to"));
+  assert.ok(codeStage.includes("Code requested for"));
 });
 
 function phoneData(operation, values = {}) {
@@ -468,7 +554,7 @@ test("phone verification uses the signed-in account's pending number and reloads
   assert.equal(result.pendingPhone, "");
   assert.deepEqual(scenario.phoneRequests, [{ operation: "verify", payload: { phone: "+12125551234", token: "123456", type: "phone_change" } }]);
   const html = await scenario.render();
-  assert.ok(html.includes("Phone number verified"));
+  assert.ok(html.includes("Phone verified"));
   assert.ok(!html.includes('name="code"'));
 });
 
@@ -546,8 +632,8 @@ test("the two saves update only their own fields and preserve the other preferen
   assert.deepEqual(scenario.invalidations, [["/", "layout"], ["/", "layout"]]);
   const html = await scenario.render();
   assert.ok(html.includes('value="Jane"') && html.includes('value="Doe"'));
-  assert.equal(selectedPreference(html, "notify_new_study_email"), "on");
-  assert.equal(selectedPreference(html, "notify_new_study_sms"), "off");
+  assert.equal(selectedPreference(html, "notify_new_study_email"), "yes");
+  assert.equal(selectedPreference(html, "notify_new_study_sms"), "no");
 });
 
 test("No choices explicitly save false so users can opt out of every notification", async () => {
@@ -653,43 +739,21 @@ test("the shared account menu places Settings directly above Sign out", () => {
   assert.ok(html.includes('href="/terms"') && html.includes("Policies &amp; terms"));
 });
 
-test("native action resets are cancelled so controlled notification choices remain visible", () => {
-  const nativeForms = [new EventTarget(), new EventTarget()];
-  const effects = [];
-  let refIndex = 0;
-  const { SettingsForm } = loadModule("src/components/SettingsForm.tsx", {
-    react: {
-      ...require("react"),
-      useRef: () => ({ current: nativeForms[refIndex++] }),
-      useEffect: (effect) => effects.push(effect),
-    },
-    "@/app/settings/actions": {
-      updateAccountSettings: async () => settingsModule.INITIAL_SETTINGS_STATE,
-      updatePhoneNotificationSettings: async () => settingsModule.INITIAL_SETTINGS_STATE,
-    },
-    "@/lib/account-settings": settingsModule,
-    "./PhoneSettingsForm": { PhoneSettingsForm: () => null },
-    "./SubmitButton": submitModule,
-    "./PolicyLinks": policyLinksModule,
-  });
-  renderToStaticMarkup(createElement(SettingsForm, { initialSettings: initialProfile, initialPhoneSettings: phoneModule.phoneSettingsForUser({ phone: "+12125551234", phone_confirmed_at: "2026-10-03" }) }));
-  const cleanups = [effects[0](), effects[1]()];
-  for (const [index, form] of nativeForms.entries()) {
-    const reset = new Event("reset", { cancelable: true });
-    assert.equal(form.dispatchEvent(reset), false);
-    assert.equal(reset.defaultPrevented, true);
-    cleanups[index]();
-  }
-  for (const form of nativeForms) assert.equal(form.dispatchEvent(new Event("reset", { cancelable: true })), true);
+test("saving a profile name leaves reminder choices untouched", async () => {
+  const scenario = createScenario();
+  const data = new FormData();
+  data.set("first_name", "New");
+  data.set("last_name", "Name");
+  const result = await scenario.saveName(data);
+  assert.equal(result.status, "success");
+  assert.deepEqual(scenario.requests[0].payload, { first_name: "New", last_name: "Name", modified_by_user_id: "participant-a" });
+  assert.equal(scenario.rows[0].notify_new_study_sms, true);
 });
 
-test("Settings and the text opt-in prompt disclose frequency, costs, opt-out and policy links", async () => {
-  const scenario = createScenario({ profileFields: { notify_new_study_sms: null }, userFields: { phone: "+12125551234", phone_confirmed_at: "2026-10-03" } });
+test("Settings links to policies and verification requires separate SMS consent", async () => {
+  const scenario = createScenario({ profileFields: { notify_new_study_sms: true }, userFields: { phone: "+12125551234", phone_confirmed_at: "2026-10-03" } });
   const html = await scenario.render();
-  const prompt = renderToStaticMarkup(await scenario.notificationPage({ searchParams: Promise.resolve({ next: "/" }) }));
-  for (const markup of [html, prompt]) {
-    for (const text of ["Reply STOP", "HELP", "Message and data rates may apply", "at most once daily", 'href="/privacy"', 'href="/sms-terms"']) assert.ok(markup.includes(text), text);
-  }
+  for (const text of ['href="/privacy"', 'href="/sms-terms"', 'Edit preferences']) assert.ok(html.includes(text), text);
   const verifyMarkup = renderToStaticMarkup(createElement(scenario.phoneForm.PhoneSettingsForm, { initialState: { status: "idle", message: "", verifiedPhone: "+12125551234", pendingPhone: "" } }));
   const consentInput = verifyMarkup.match(/<input[^>]*name="verification_sms_consent"[^>]*>/)?.[0];
   assert.ok(consentInput);

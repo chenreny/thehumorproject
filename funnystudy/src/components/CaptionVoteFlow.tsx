@@ -983,6 +983,7 @@ export function CaptionVoteFlow({
         return;
       }
       setParticipation(result.participation);
+      window.dispatchEvent(new CustomEvent("funnystudy:study-started", { detail: { studyId } }));
       setCaptionFlipDirection("forward");
       setIsStartPageVisible(false);
       setIsCompletionPageVisible(Boolean(result.participation.ended_at));

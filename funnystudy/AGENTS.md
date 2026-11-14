@@ -304,3 +304,37 @@ Purpose: Quick orientation for anyone editing the project. Keep this file curren
 - 2025-12-04: Supabase server helper now awaits `cookies()` (Next.js 16) so call sites must `await createClient()`. (assistant)
 - 2025-12-04: Google login now uses `NEXT_PUBLIC_GOOGLE_CLIENT_ID`; env sample/readme updated. (assistant)
 - 2025-12-04: Created AGENTS.md with project overview and working notes. (assistant)
+
+## November 11, 2026 reminder UI draft
+
+- The latest local pass moves a compact reminder invitation below the active-study cards and after Start/Continue Study on the study welcome screen. It appears once per browser user when choices or phone verification need attention, then stays out of the way. Saved choices are changed in Settings; there is no recurring Review choices prompt on home or in study navigation.
+- The reminder journey uses the app's dark/gold or light/gold palette with tighter type and spacing. A saved Yes for text or calls without a verified phone enters at verification.
+- Phone and desktop visual fixtures for the study list, reminder choice, code entry, saved state, and Settings are in `design/review-reminders-2026-11-11/`. They use controlled data and production CSS, not live Auth/provider delivery.
+- The local build, 43 Settings tests, and 30 demographics/study tests passed. Browser QA confirmed first visit, reload, separate verification prompt, and dismiss behavior. The design is **unapproved**. No commit, push, deployment, or live provider configuration change was made.
+
+## November 12, 2026 notification edit reference
+
+- The local notification editor follows the supplied screenshot in the original light/gold and dark/gold themes, with channel switches, a compact verified-phone strip, and Cancel / Save changes. Cancel discards the edit and returns to the overview; leaving during verification retains the draft. Newly enabled phone channels show consent disclosures before saving.
+- Change email explains that the email belongs to the Google sign-in account; it does not change Auth email. Compact phone verification shows the current numbered step and number/code heading. Exit actions respect the supplied return path.
+- Actual-component visual fixtures and validation notes are in `design/review-notification-edit-2026-11-12/`. Build, 44 Settings tests, 30 demographics/study tests, and controlled browser interaction checks pass. Work remains local, without a commit or push.
+- The subsequent Settings page refinement uses the HTML prototype's compact overview, a separate profile card, and the account menu in the top bar. Edit preferences opens the shared editor in a dialog; closing refreshes saved values, while an interrupted draft can be resumed or discarded from Settings. Name fields retain typed values after errors. Light/dark desktop and mobile screenshots and browser-check notes are in `design/review-settings-2026-11-12/`.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
+## November 12, 2026 reminder journey revision (supersedes the November 11 UI draft)
+
+- The November 11 home invitation and dark/gold setup descriptions above are superseded. The current local draft removes reminder prompts from the home list and study welcome. After a participant starts an unfinished study, clicking Back to studies can show a one-time, browser-user-scoped exit sheet with Set up reminders, Leave without reminders, and Stay in study. It never appears before participation or on every visit.
+- `/notification-preferences` now groups Email, Text message, and Phone call on one light, blue-accented screen with separate Yes/No/Later controls. Phone Yes without a verified number leads to number/code entry; review and explicit Save follow. Draft state is kept for the browser session. The saved summary returns to the original destination. `/settings` now uses the same choice controls and light utility style, shows phone status and inline verification, and saves reminder choices separately from profile names.
+- See `design/reminder-journey.md` for the intended path and `design/review-reminders-v2-2026-11-12/README.md` for phone and desktop visual fixtures. The Oscar link in the handoff opens an engineering handoff article, not a text-reminder UX example; no reminder-specific behavior was attributed to it. The design is local and **unapproved**. No commit, push, deployment, or live provider change was made.
+
+## November 12, 2026 notification setup proposal
+
+- The latest product discussion is design-only and supersedes the prior local reminder journey as a proposed direction. Read `design/notification-setup-proposal.md` and open `design/notification-setup-prototype.html` before changing the notification UI again. The proposal covers first login, resumable drafts, final-save consent, later edits, and durable Not now behavior. It has **not** been implemented or approved; the earlier local app changes remain unapproved too.

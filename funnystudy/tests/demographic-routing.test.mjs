@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import test from "node:test";
+import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 
@@ -307,9 +308,12 @@ function createScenario({
     "@/lib/study-participation": participationModule,
     "@/lib/url": urls,
     "@/lib/account-settings": settingsModule,
+    "@/lib/phone-settings": loadModule("src/lib/phone-settings.ts"),
     "@/lib/demographic-skips": skips,
     "@/app/profile-actions": { signOut: async () => {} },
     "@/components/AccountMenu": { AccountMenu: NullComponent },
+    "@/components/NotificationHome": { NotificationHome: NullComponent },
+    "@/components/StudyExitPrompt": { StudyExitPrompt: ({ hasPendingChoices }) => createElement("a", { "data-pending-reminders": hasPendingChoices, href: "/" }, "Back to studies") },
     "@/components/LocalDateTime": loadModule("src/components/LocalDateTime.tsx"),
     "@/components/CompleteProfileForm": { CompleteProfileForm: NullComponent },
     "@/components/StudyEasterEgg": { StudyEasterEgg: NullComponent },
@@ -402,28 +406,45 @@ test("a fresh login clears skips and asks previously skipped questions again", a
   assert.equal(scenario.cookieValues.has(skips.DEMOGRAPHIC_SKIPS_COOKIE), false);
 });
 
-test("login prompts NULL notifications before demographics and preserves a direct study destination", async () => {
+test("login preserves a direct study destination while reminder choices remain available there", async () => {
   const scenario = createScenario({ notificationPreferences: { notify_new_study_sms: null } });
   const response = await scenario.callback(new Request("https://example.test/auth/callback?code=test-code&next=/study/42"));
-  assert.equal(response.url.pathname, "/notification-preferences");
+  assert.equal(response.url.pathname, "/demographics");
   assert.equal(response.url.searchParams.get("next"), "/study/42");
   assert.equal(response.status, 303);
   assert.equal(scenario.studyLoads, 0);
 });
 
-test("a fresh successful login clears notification skips and asks skipped NULL choices again", async () => {
+test("a fresh successful login clears notification skips for the contextual invitation", async () => {
   const cookie = encodeURIComponent(JSON.stringify({ profileId, preferences: ["notify_new_study_email"] }));
   const scenario = createScenario({ answered: [1, 2], notificationSkips: cookie, notificationPreferences: { notify_new_study_email: null } });
   assert.match(renderToStaticMarkup(await scenario.home({})), /No active studies/);
   const response = await scenario.callback(new Request("https://example.test/auth/callback?code=test-code"));
-  assert.equal(response.url.pathname, "/notification-preferences");
+  assert.equal(response.url.pathname, "/");
   assert.equal(scenario.cookieValues.has("notification_skips"), false);
 });
 
-test("home prompts unanswered notifications even with no active studies", async () => {
+test("home keeps the empty study state clear of reminder prompts", async () => {
   const scenario = createScenario({ answered: [1, 2], notificationPreferences: { notify_new_study_phone_call: null } });
-  await assert.rejects(scenario.home({}), (error) => error.path === "/notification-preferences?next=%2F");
-  assert.equal(scenario.studyLoads, 0);
+  const html = renderToStaticMarkup(await scenario.home({}));
+  assert.match(html, /No active studies/);
+  assert.doesNotMatch(html, /Choose reminders/);
+  assert.equal(scenario.studyLoads, 1);
+});
+
+test("active studies remain prominent and reminders do not interrupt home", async () => {
+  const pending = createScenario({ answered: [1, 2], studies: [studyRow(1)], notificationPreferences: { notify_new_study_email: null } });
+  const html = renderToStaticMarkup(await pending.home({}));
+  assert.match(html, /Active studies/);
+  assert.match(html, /href="\/study\/1"/);
+  assert.doesNotMatch(html, /Choose reminders/);
+
+  const answered = createScenario({ answered: [1, 2], studies: [studyRow(1)] });
+  const answeredHtml = renderToStaticMarkup(await answered.home({}));
+  assert.doesNotMatch(answeredHtml, /Choose reminders/);
+
+  const unverified = createScenario({ answered: [1, 2], studies: [studyRow(1)], notificationPreferences: { notify_new_study_sms: true } });
+  assert.doesNotMatch(renderToStaticMarkup(await unverified.home({})), /Verify number/);
 });
 
 test("failed login retains notification skips and unavailable preference data fails open", async (t) => {
