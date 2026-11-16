@@ -83,6 +83,7 @@ begin
     perform vault.create_secret('rollback-only-study-email-test-key', 'funnystudy_resend_api_key');
   end if;
   update public.profiles set notify_new_study_email = false;
+  update public.profiles set notification_email = null where id in (participant, other_participant);
   update public.studies set is_private = true;
   delete from public.study_participations
   where profile_id in (participant, other_participant) and study_id in (first_study, second_study);
@@ -129,6 +130,11 @@ begin
   if (select count(*) from funnystudy_notifications.email_recipients(test_time)) <> 2 then
     raise exception 'Completing one study must not suppress another unfinished study';
   end if;
+  update public.profiles set notification_email = 'different-address@example.invalid' where id = participant;
+  if not exists (select 1 from funnystudy_notifications.email_recipients(test_time)
+      where profile_id = participant and email = 'different-address@example.invalid') then
+    raise exception 'A participant must be able to choose a different notification email';
+  end if;
 
   update funnystudy_notifications.email_config set enabled = false;
   if funnystudy_notifications.queue_daily_emails(test_time) <> 0 then
@@ -149,6 +155,10 @@ begin
       where reminder_date <> '2035-01-15' or payload->>'text' not like '%/settings%'
         or payload->>'text' not like '%https://%') then
     raise exception 'Emails must use the Eastern calendar date and contain study/settings links';
+  end if;
+  if not exists (select 1 from funnystudy_notifications.email_deliveries
+      where profile_id = participant and payload->'to'->>0 = 'different-address@example.invalid') then
+    raise exception 'The queued reminder must use the chosen notification email';
   end if;
   if funnystudy_notifications.queue_daily_emails(test_time + interval '1 day') <> 2 then
     raise exception 'An unfinished study must generate a fresh reminder on the next day';
@@ -256,12 +266,13 @@ begin
   if not exists (select 1 from funnystudy_notifications.email_deliveries where id = delivery.id and status = 'cancelled') then
     raise exception 'Stale reminders must expire within the idempotency retention window';
   end if;
+  update public.profiles set notification_email = 'new-address@example.invalid'
+  where id = other_participant;
   update funnystudy_notifications.email_deliveries set status = 'queued',
-    payload = jsonb_set(payload, '{to}', '["previous-address@example.invalid"]')
-  where id = delivery.id;
+    payload = original_payload where id = delivery.id;
   perform funnystudy_notifications.deliver_emails(test_time + interval '10 minutes');
   if not exists (select 1 from funnystudy_notifications.email_deliveries where id = delivery.id and status = 'cancelled') then
-    raise exception 'Account email changes must prevent delivery to the old address';
+    raise exception 'Notification email changes must prevent delivery to the old address';
   end if;
 end;
 $$;

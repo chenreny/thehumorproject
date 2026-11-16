@@ -18,7 +18,7 @@ export default async function SettingsPage() {
 
   const { data: settings, error } = await supabase
     .from("profiles")
-    .select("first_name, last_name, notify_new_study_email, notify_new_study_sms, notify_new_study_phone_call")
+    .select("first_name, last_name, notification_email, notify_new_study_email, notify_new_study_sms, notify_new_study_phone_call")
     .eq("id", user.id)
     .single<AccountSettings>();
 

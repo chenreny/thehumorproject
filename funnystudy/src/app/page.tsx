@@ -58,7 +58,7 @@ export default async function Home({
     await Promise.all([
       supabase
         .from("profiles")
-        .select("first_name, last_name, notify_new_study_email, notify_new_study_sms, notify_new_study_phone_call")
+        .select("first_name, last_name, notification_email, notify_new_study_email, notify_new_study_sms, notify_new_study_phone_call")
         .eq("id", user.id)
         .single(),
       fetchPublicActiveStudyIdentities(supabase, studyNow),

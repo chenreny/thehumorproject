@@ -55,6 +55,7 @@ async function main() {
       "20261004000300_schedule_daily_study_email_reminders.sql",
       "20261004000708_send_study_emails_without_public_http_queue.sql",
       "20261004001300_support_installed_http_header_types.sql",
+      "20261115120000_add_notification_email_destination.sql",
     ]) {
       const version = file.split("_")[0];
       const name = file.slice(version.length + 1, -4);

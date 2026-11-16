@@ -20,7 +20,7 @@ export default function PrivacyPage() {
         <h2>Information we collect</h2>
         <ul>
           <li>Account information from Google sign-in, including your account identifier and email address, and the first and last names you provide.</li>
-          <li>A phone number if you choose to add one, its verification status, and your email, text-message, and phone-call notification choices.</li>
+          <li>A separate notification email if you choose one, a phone number if you add one, its verification status, and your email, text-message, and phone-call notification choices.</li>
           <li>Demographic survey answers you submit, study participation and completion records, caption interactions, timing information, and study statistics.</li>
           <li>Cookies needed to keep you signed in and remember skipped questions, local storage for your theme, and a session-storage identifier used with study activity. Our hosting and service providers may also process IP addresses, browser information, and request or delivery logs to operate and secure the service.</li>
           <li>Information you send when asking for account help, privacy assistance, or changes to notification choices.</li>

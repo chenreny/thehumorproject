@@ -23,7 +23,7 @@ export default function NotificationTermsPage() {
       </section>
       <section>
         <h2>Email reminders</h2>
-        <p>Choosing Yes for Email requests study-reminder emails at your account email address. Each reminder includes a link to manage your choices in Settings. Choosing No stops future study-reminder emails; this does not prevent account or security messages necessary to operate your account.</p>
+        <p>Choosing Yes for Email requests study-reminder emails at your sign-in email address, or at a different notification email you choose in Settings. Each reminder includes a link to manage your choices. Choosing No stops future study-reminder emails; this does not prevent account or security messages necessary to operate your account.</p>
       </section>
       <section>
         <h2>Automated phone calls</h2>

@@ -45,7 +45,7 @@ export async function fetchNotificationPreferences(
   skipped: readonly NotificationPreference[] = []
 ) {
   const { data: profile, error } = await supabase.from("profiles")
-    .select("first_name, last_name, notify_new_study_email, notify_new_study_sms, notify_new_study_phone_call")
+    .select("first_name, last_name, notification_email, notify_new_study_email, notify_new_study_sms, notify_new_study_phone_call")
     .eq("id", profileId).single<AccountSettings>();
   if (error) console.error("[Notifications] load preferences failed", error);
   return {

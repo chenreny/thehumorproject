@@ -3082,6 +3082,7 @@ export type Database = {
           last_name: string | null
           modified_by_user_id: string
           modified_datetime_utc: string
+          notification_email: string | null
           notify_new_study_email: boolean | null
           notify_new_study_phone_call: boolean | null
           notify_new_study_sms: boolean | null
@@ -3099,6 +3100,7 @@ export type Database = {
           last_name?: string | null
           modified_by_user_id?: string
           modified_datetime_utc?: string
+          notification_email?: string | null
           notify_new_study_email?: boolean | null
           notify_new_study_phone_call?: boolean | null
           notify_new_study_sms?: boolean | null
@@ -3116,6 +3118,7 @@ export type Database = {
           last_name?: string | null
           modified_by_user_id?: string
           modified_datetime_utc?: string
+          notification_email?: string | null
           notify_new_study_email?: boolean | null
           notify_new_study_phone_call?: boolean | null
           notify_new_study_sms?: boolean | null
