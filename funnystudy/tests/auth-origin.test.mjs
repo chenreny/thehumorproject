@@ -1,11 +1,21 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import test from "node:test";
 import { NextRequest, NextResponse } from "next/server.js";
+import { findPagesDir } from "next/dist/lib/find-pages-dir.js";
 import ts from "typescript";
 
-const { outputText } = ts.transpileModule(readFileSync("proxy.ts", "utf8"), {
+const { outputText } = ts.transpileModule(readFileSync("src/proxy.ts", "utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
+});
+
+test("Next.js discovers the proxy beside the actual app directory", () => {
+  const { appDir } = findPagesDir(process.cwd());
+  assert.ok(appDir);
+  assert.equal(join(dirname(appDir), "proxy.ts"), join(process.cwd(), "src/proxy.ts"));
+  assert.ok(existsSync(join(dirname(appDir), "proxy.ts")));
+  assert.equal(existsSync("proxy.ts"), false);
 });
 
 async function run(environment, url, method = "GET", siteUrl = "https://study.example.test", headers = {}) {

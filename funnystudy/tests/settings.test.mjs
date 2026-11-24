@@ -104,7 +104,7 @@ test("browser, server and proxy ignore shared auth cookies and local logout pres
   };
   const server = loadModule("src/lib/supabase/server.ts", imports);
   const browser = loadModule("src/lib/supabase/client.ts", imports);
-  const { proxy } = loadModule("proxy.ts", imports);
+  const { proxy } = loadModule("src/proxy.ts", imports);
   const request = () => ({ nextUrl: { pathname: "/settings", clone: () => new URL("https://fixture.test/settings") }, headers: {}, cookies: cookieStore });
   for (const client of [await server.createClient(), browser.createClient()]) {
     assert.equal((await client.auth.getSession()).data.session, null);
@@ -764,7 +764,7 @@ test("Settings links to policies and verification requires separate SMS consent"
 
 test("policy pages are public without an Auth lookup and neighboring routes stay protected", async () => {
   let authLookups = 0;
-  const { proxy } = loadModule("proxy.ts", {
+  const { proxy } = loadModule("src/proxy.ts", {
     "@supabase/ssr": { createServerClient: () => ({ auth: { getSession: async () => { authLookups++; return { data: { session: null } }; } } }) },
     "@/lib/supabase/env": { getSupabasePublicEnv: () => ({ supabaseUrl: "https://fixture.test", supabasePublicKey: "fixture" }) },
     "@/lib/supabase/authCookies": { getSupabaseAuthCookieOptions: () => ({}) },

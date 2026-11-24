@@ -37,7 +37,7 @@ Purpose: Quick orientation for anyone editing the project. Keep this file curren
 - SMS setup and verification are documented in `docs/daily-study-sms.md`; `npm run study-sms -- status production` reports configuration/counts without secrets or recipient numbers. Setup uses `TELNYX_API_KEY`, `TELNYX_FROM_NUMBER`, and `TELNYX_MESSAGING_PROFILE_ID` plus the operator's Management API token; Next.js needs no Telnyx credential.
 
 ## Authentication sessions
-- In production builds (`NODE_ENV=production`), `proxy.ts` redirects app pages and Auth routes to the configured `NEXT_PUBLIC_SITE_URL` origin before creating or reading Auth cookies. This keeps OAuth's PKCE verifier and callback on the same hostname when visitors open a generated deployment URL, without relying on Vercel system variables being available in Proxy. The 307 redirect preserves login POST bodies, paths, and query strings; local development, previews without a configured site URL, and API callbacks are unchanged. Regression check: `node --test tests/auth-origin.test.mjs`.
+- `src/proxy.ts` must live beside `src/app` so Next.js discovers it; a root-level `proxy.ts` is ignored with this layout. In production builds (`NODE_ENV=production`), it redirects app pages and Auth routes to the configured `NEXT_PUBLIC_SITE_URL` origin before creating or reading Auth cookies. This keeps OAuth's PKCE verifier and callback on the same hostname when visitors open a generated deployment URL. The 307 redirect preserves login POST bodies, paths, and query strings; local development, previews without a configured site URL, and API callbacks are unchanged. Regression check, including file discovery: `node --test tests/auth-origin.test.mjs`.
 - Auth cookies are scoped to this app and Supabase project using `getSupabaseAuthCookieOptions`; browser, server, and proxy clients must use the same options.
 - Ordinary logout and auth cleanup use `signOut({ scope: "local" })` so other apps remain signed in.
 - Existing shared auth cookies are not imported; users sign in once per app after this change.
@@ -58,7 +58,7 @@ Purpose: Quick orientation for anyone editing the project. Keep this file curren
 
 ## Conventions and reminders
 - Use the shared Supabase client helpers (`createClient`) for server/client contexts instead of instantiating ad hoc.
-- Update the public route allowlist in `proxy.ts` whenever adding unauthenticated pages.
+- Update the public route allowlist in `src/proxy.ts` whenever adding unauthenticated pages.
 - Tailwind v4 uses CSS-driven tokens; add design tokens in `src/app/globals.css` rather than a config file.
 - Do not crop caption images—render them fully (object-contain) and adjust layout instead of cutting off any part of the image.
 - COMMANDMENT: Caption text now sits above its image; keep that order consistent and do not let buttons or overlays interrupt it.
