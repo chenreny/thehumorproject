@@ -15,12 +15,13 @@ export async function proxy(request: NextRequest) {
 
   // OAuth's verifier cookie must be written on the same host as its callback.
   // Move production deployment URLs to the configured site before login starts.
-  const siteUrl = process.env.VERCEL_ENV === "production"
+  const siteUrl = process.env.NODE_ENV === "production"
     ? process.env.NEXT_PUBLIC_SITE_URL?.trim()
     : undefined;
   if (siteUrl) {
     const canonicalUrl = new URL(siteUrl);
-    if (request.nextUrl.origin !== canonicalUrl.origin) {
+    const requestHost = request.headers.get("host") ?? request.nextUrl.host;
+    if (requestHost.toLowerCase() !== canonicalUrl.host.toLowerCase()) {
       canonicalUrl.pathname = request.nextUrl.pathname;
       canonicalUrl.search = request.nextUrl.search;
       canonicalUrl.hash = "";

@@ -8,8 +8,9 @@ const { outputText } = ts.transpileModule(readFileSync("proxy.ts", "utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 });
 
-async function run(environment, url, method = "GET") {
+async function run(environment, url, method = "GET", siteUrl = "https://study.example.test", headers = {}) {
   const previous = {
+    NODE_ENV: process.env.NODE_ENV,
     VERCEL_ENV: process.env.VERCEL_ENV,
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   };
@@ -31,9 +32,12 @@ async function run(environment, url, method = "GET") {
     return imports[name];
   }, loadedModule, loadedModule.exports);
   try {
-    process.env.VERCEL_ENV = environment;
-    process.env.NEXT_PUBLIC_SITE_URL = "https://study.example.test";
-    const response = await loadedModule.exports.proxy(new NextRequest(url, { method }));
+    process.env.NODE_ENV = environment === "development" ? "development" : "production";
+    if (environment === undefined) delete process.env.VERCEL_ENV;
+    else process.env.VERCEL_ENV = environment;
+    if (siteUrl === null) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = siteUrl;
+    const response = await loadedModule.exports.proxy(new NextRequest(url, { method, headers }));
     return { response, authCalls };
   } finally {
     for (const [key, value] of Object.entries(previous)) {
@@ -66,9 +70,21 @@ test("canonical login proceeds normally without a redirect loop", async () => {
   assert.equal(authCalls, 1);
 });
 
-test("local and preview login origins and API callbacks remain unchanged", async () => {
+test("production canonicalization does not depend on Vercel system variables", async () => {
+  const { response, authCalls } = await run(undefined, "https://deployment.example.test/login");
+  assert.equal(response.headers.get("location"), "https://study.example.test/login");
+  assert.equal(authCalls, 0);
+});
+
+test("canonicalization checks the browser's Host header even when the request URL is normalized", async () => {
+  const { response, authCalls } = await run("production", "https://study.example.test/login", "GET", "https://study.example.test", { host: "deployment.example.test" });
+  assert.equal(response.headers.get("location"), "https://study.example.test/login");
+  assert.equal(authCalls, 0);
+});
+
+test("local login, previews without a configured origin, and API callbacks remain unchanged", async () => {
   for (const environment of ["development", "preview"]) {
-    const { response, authCalls } = await run(environment, "http://localhost:3014/auth/login", "POST");
+    const { response, authCalls } = await run(environment, "http://localhost:3014/auth/login", "POST", environment === "preview" ? null : "https://study.example.test");
     assert.equal(response.headers.get("location"), null);
     assert.equal(authCalls, 1);
   }
