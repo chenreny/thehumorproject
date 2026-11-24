@@ -8,12 +8,29 @@ const publicPolicyRoutes = ["/terms", "/privacy", "/cookies", "/notification-ter
 const publicRoutes = ["/login", "/auth/login", "/auth/callback"];
 
 export async function proxy(request: NextRequest) {
-  // Policy pages must be readable without an account or an Auth round trip.
-  if (publicPolicyRoutes.includes(request.nextUrl.pathname)) return NextResponse.next();
   // Let API routes handle their own auth and errors.
   if (request.nextUrl.pathname.startsWith("/api/")) {
     return NextResponse.next();
   }
+
+  // OAuth's verifier cookie must be written on the same host as its callback.
+  // Move production deployment URLs to the configured site before login starts.
+  const siteUrl = process.env.VERCEL_ENV === "production"
+    ? process.env.NEXT_PUBLIC_SITE_URL?.trim()
+    : undefined;
+  if (siteUrl) {
+    const canonicalUrl = new URL(siteUrl);
+    if (request.nextUrl.origin !== canonicalUrl.origin) {
+      canonicalUrl.pathname = request.nextUrl.pathname;
+      canonicalUrl.search = request.nextUrl.search;
+      canonicalUrl.hash = "";
+      // Preserve POST bodies, including the login form's terms confirmation.
+      return NextResponse.redirect(canonicalUrl, 307);
+    }
+  }
+
+  // Policy pages must be readable without an account or an Auth round trip.
+  if (publicPolicyRoutes.includes(request.nextUrl.pathname)) return NextResponse.next();
 
   const response = NextResponse.next({
     request: {

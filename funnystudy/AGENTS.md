@@ -37,6 +37,7 @@ Purpose: Quick orientation for anyone editing the project. Keep this file curren
 - SMS setup and verification are documented in `docs/daily-study-sms.md`; `npm run study-sms -- status production` reports configuration/counts without secrets or recipient numbers. Setup uses `TELNYX_API_KEY`, `TELNYX_FROM_NUMBER`, and `TELNYX_MESSAGING_PROFILE_ID` plus the operator's Management API token; Next.js needs no Telnyx credential.
 
 ## Authentication sessions
+- On Vercel production deployments, `proxy.ts` redirects app pages and Auth routes to the configured `NEXT_PUBLIC_SITE_URL` origin before creating or reading Auth cookies. This keeps OAuth's PKCE verifier and callback on the same hostname when visitors open a generated deployment URL. The 307 redirect preserves login POST bodies, paths, and query strings; local development, previews, and API callbacks are unchanged. Regression check: `node --test tests/auth-origin.test.mjs`.
 - Auth cookies are scoped to this app and Supabase project using `getSupabaseAuthCookieOptions`; browser, server, and proxy clients must use the same options.
 - Ordinary logout and auth cleanup use `signOut({ scope: "local" })` so other apps remain signed in.
 - Existing shared auth cookies are not imported; users sign in once per app after this change.
